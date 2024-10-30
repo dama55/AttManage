@@ -19,11 +19,25 @@ services:
     container_name: nextjs-container
     environment:
       DATABASE_URL: mysql://user:password@db:3306/mydb
+    volumes:
+      - ./app:/app
+      - /app/node_modules
     ports:
       - "3000:3000"
     depends_on:
       - db
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-container
+    environment:
+      PMA_HOST: db
+      PMA_USER: user
+      PMA_PASSWORD: password
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
 
 
 volumes:

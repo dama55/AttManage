@@ -1,24 +1,22 @@
 # ベース
-FROM node:23-alpine
+FROM node:20
 
 # 作業ディレクトリを設定
 WORKDIR /app
 
-# パッケージファイルをコピーして依存関係をインストール
-COPY package.json package-lock.json ./
+# Install dependencies
+COPY ./app/package*.json ./
 RUN npm install
 
-# Next.jsアプリのコードをコピー
+# Copy app source code
 COPY . .
 
-# Prisma Clientをビルド
-RUN npx prisma generate
-
-# Next.jsアプリをビルド
-RUN npm run build
-
-# アプリを起動するポートを指定
+# Expose the port the app runs on
 EXPOSE 3000
 
-# Next.jsアプリを起動
-CMD ["npm", "start"]
+# Start the app
+CMD ["npm", "run", "dev"]
+
+
+# コンテナを開きっぱなしにする
+# CMD ["tail", "-f", "/dev/null"]
