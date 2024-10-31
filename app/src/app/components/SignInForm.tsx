@@ -1,48 +1,32 @@
 'use client';
-import { useState } from 'react';
+import { signIn } from "next-auth/react";
 
-const SignInForm = () => {
-  const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const res = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name, password }),
+function SignInForm() {
+  const handleSignIn = async (event: any) => {
+    event.preventDefault();
+    const name = event.target.name.value;
+    const password = event.target.password.value;
+    
+    // NextAuth.jsを使ってサインイン
+    const result = await signIn("credentials", {
+      redirect: false,
+      credentials: { name, password },
     });
 
-    const data = await res.json();
-    if (res.ok) {
-      console.log('ログイン成功', data);
-    } else {
-      console.log('ログイン失敗', data.message);
+    if (result?.error) {
+      // 認証エラーの処理
+      console.error("Sign-in failed:", result.error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
+    <form onSubmit={handleSignIn}>
+      <input type="text" name="name" placeholder="Name" required />
+      <input type="password" name="password" placeholder="Password" required />
       <button type="submit">Sign In</button>
     </form>
   );
-};
+}
+
 
 export default SignInForm;
