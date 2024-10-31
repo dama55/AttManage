@@ -15,8 +15,8 @@ COPY . .
 EXPOSE 3000
 
 # Start the app
-CMD ["npm", "run", "dev"]
+# CMD ["npm", "run", "dev"]
 
 
 # コンテナを開きっぱなしにする
-# CMD ["tail", "-f", "/dev/null"]
+CMD ["tail", "-f", "/dev/null"]

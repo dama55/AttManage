@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model User { //テーブル名は大文字で始まる
   id       Int    @id @default(autoincrement()) // 主キーで、自動インクリメント
   name     String                             // ユーザー名
   password String                             // ユーザーパスワード
