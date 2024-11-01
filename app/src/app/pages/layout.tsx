@@ -2,7 +2,7 @@
 'use client'; // クライアントコンポーネントとして設定
 
 import { SessionProvider } from "next-auth/react";
-import Header from "@/components/auth/Header"; // Headerをインポート
+import Header from "@/components/Header"; // Headerをインポート
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
