@@ -13,8 +13,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User { //テーブル名は大文字で始まる
-  id       Int    @id @default(autoincrement()) // 主キーで、自動インクリメント
-  name     String                             // ユーザー名
-  password String                             // ユーザーパスワード
+model User {
+  id       Int      @id @default(autoincrement()) // 主キーで、自動インクリメント
+  name     String                                // ユーザー名
+  password String                                // ユーザーパスワード
+  role     String  @default("Employee")          // 役割（デフォルトは "Employee"）
+  attendance Attendance[]                        // Attendanceとの関連
 }
+
+model Attendance {
+  id         Int      @id @default(autoincrement()) // 主キーで自動インクリメント
+  userId     Int                                   // Userテーブルの外部キー
+  user       User     @relation(fields: [userId], references: [id]) // Userとの関連
+  type       String                                // 種別 (例: "出勤", "休憩開始", "休憩終了", "退勤")
+  dateTime   DateTime                              // 日時
+}
+

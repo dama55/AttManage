@@ -15,6 +15,12 @@ export default NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        if (!credentials) {
+          console.error("No credentials provided");
+          return null;
+        }
+      
+
         const user = await prisma.user.findFirst({
           where: { name: credentials?.name },
         });

@@ -1,10 +1,11 @@
-import SignInForm from '@/components/SignInForm';
 
-export default function RegisterPage(){
+import SignUpForm from '@/components/auth/SignUpForm';
+
+export default function SignUpPage(){
     return (
         <div>
-            <h1>ログイン</h1>
-            <SignInForm/>
+            <h1>サインアップ</h1>
+            <SignUpForm/>
         </div>
     );
 }

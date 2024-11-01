@@ -7,6 +7,14 @@ const prisma = new PrismaClient();
 export async function POST(request: Request) {
   const { name, password } = await request.json();
 
+  const existingUser = await prisma.user.findFirst({
+    where: {name},
+  })
+
+  if (existingUser){
+    return NextResponse.json({error: 'ユーザーは既に存在します' }, { status: 409 })
+  }
+
   // パスワードをハッシュ化
   const hashedPassword = await bcrypt.hash(password, 10);
 
