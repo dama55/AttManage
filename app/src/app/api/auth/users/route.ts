@@ -1,18 +1,32 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { supabase } from '@/lib/supabaseClient';
+import { error } from 'console';
 
 export async function GET(request: Request) {
-  // 認証情報が必要な場合、ここでセッションを確認するコードを追加
 
-  const users = await prisma.user.findMany({
-    select: {
-      id: true,
-      name: true,
-      role: true,
-      // password: false  // パスワードを除外
-    },
-  });
-  return NextResponse.json(users);
+  try {
+    // supabaseのUserテーブルから全てのユーザーのカラムを取得
+
+    const { data: userData, error: userError } = await supabase
+    .from('User')
+    .select('userId, name, role')
+
+    if (userError){
+      throw new Error(userError.message);
+    }
+
+    if (!userData || userData.length === 0){
+      return NextResponse.json({error: 'User not found'}, {status: 404});
+    }
+
+    return NextResponse.json(userData);//userDataは配列で返される
+  }catch(err:unknown){
+    if (err instanceof Error){
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    } else {
+      // `err` が `Error` 型でない場合のフォールバック
+      return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
+    }
+  }
+  
 }

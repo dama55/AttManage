@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 
 interface User {
-    id: number;
+    userId: string;
     name: string;
     role: string;
 }
@@ -38,8 +38,8 @@ export default function EmployeeList() {
                 </thead>
                 <tbody>
                     {users.map((user) => (
-                        <tr key={user.id}>
-                            <td>{user.id}</td>
+                        <tr key={user.userId}>
+                            <td>{user.userId}</td>
                             <td>{user.name}</td>
                             <td>{user.role}</td>
                         </tr>

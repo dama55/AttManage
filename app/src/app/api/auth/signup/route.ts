@@ -26,13 +26,18 @@ export async function POST(request: Request) {
     // Userテーブルにデータを挿入
     const { data: userData, error: userError } = await supabase
       .from('User')
-      .insert([{ userId, username: displayName }]);
+      .insert([{ userId, name: displayName }]);
     
     if (userError) {
       // Userテーブルへの挿入が失敗した場合、auth.usersのユーザーを削除
-      await supabase.auth.admin.deleteUser(userId); // SupabaseのAdmin APIを使用してユーザーを削除
-      console.log('Userテーブルへのデータ保存に失敗しました: ' + userError.message);
-      return NextResponse.json({ error: 'Userテーブルへのデータ保存に失敗しました: ' + userError.message }, { status: 500 });
+      const response = await supabase.auth.admin.deleteUser(userId); // SupabaseのAdmin APIを使用してユーザーを削除
+
+      let errmsg = 'Userテーブルへのデータ保存に失敗しました: '+ userError.message;
+      if (response && response.error){
+        errmsg = errmsg + ", " + response.error.message;
+      }
+      console.log(errmsg);
+      return NextResponse.json({ error: errmsg }, { status: 500 });
     }
 
     // 成功した場合のレスポンス
