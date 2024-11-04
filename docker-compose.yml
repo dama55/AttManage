@@ -15,8 +15,10 @@ services:
       - "3306:3306"
 
   nextjs:
-    build: .
+    build: ./app
     container_name: nextjs-container
+    env_file:
+      - ./app/.env.local
     environment:
       DATABASE_URL: mysql://root:password@db:3306/mydb
       NEXTAUTH_URL: http://localhost:3000
