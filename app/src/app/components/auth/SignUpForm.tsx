@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 function SignUpForm() {
-  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const handleSignUp = async (event: any) => {
     event.preventDefault();
@@ -11,30 +11,30 @@ function SignUpForm() {
     const password = event.target.password.value;
 
     try {
-      // サインアップ処理（APIリクエストを送信するなど）
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ displayName, email, password }), // displayNameも送信
+        body: JSON.stringify({ displayName, email, password }),
       });
-
-      // レスポンスをjson変換
-      const result = await response.json();
+      
+      const responseJson = await response.json();
 
       if (!response.ok) {
-        setError(result.error || 'Sign-up failed');
-        throw new Error('Sign-up failed', result.error);
+        // レスポンスをjson変換してエラーメッセージを取得
+        const error = responseJson.error
+        
+        throw new Error(error || 'Sign-up failed');
       }
-
-      // サインアップ成功後の処理（例えば、サインインページへのリダイレクトなど）
+      setMessage(responseJson.message);
       console.log('Sign-up successful');
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        // エラーハンドリング
-        setError(err.message);
-        console.error('Sign-up failed:'+error, err);
-      }
+      
+      // ここで成功後の処理を追加
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setMessage(errorMessage);
+      console.error('Sign-up failed:', errorMessage);
     }
+  
   };
 
   return (
@@ -43,7 +43,7 @@ function SignUpForm() {
       <input type="email" name="email" placeholder="Email" required />
       <input type="password" name="password" placeholder="Password" required />
       <button type="submit">Sign Up</button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {message && <p style={{ color: 'red' }}>{message}</p>}
     </form>
   );
 }
