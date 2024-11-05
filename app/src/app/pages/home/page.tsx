@@ -1,35 +1,13 @@
 // /app/pages/home/page.tsx
 'use client';
-import { useSession } from "next-auth/react";
+import { useUserContext } from "@/context/UserContext";
 import { useEffect, useState } from "react";
 import EmployeeList from '@/components/employee/Employees';
 import QrCodeLink from '@/components/QrCodeLink';
 import '@/globals.css';
 
 export default function Home() {
-  const { data: session } = useSession();
-  const [role, setRole] = useState<string | null>(null);
-
-  // ロールを取得するためのAPI呼び出し
-  useEffect(() => {
-    const fetchRole = async () => {
-      if (session?.user.id) {
-        try {
-          const response = await fetch(`/api/auth/user?id=${session.user.id}`);
-          if (response.ok) {
-            const data = await response.json();
-            setRole(data.role);
-          } else {
-            console.error("Failed to fetch role");
-          }
-        } catch (error) {
-          console.error("Error fetching role:", error);
-        }
-      }
-    };
-
-    fetchRole();
-  }, [session]);
+  const { role } = useUserContext();
 
   return (
     <div>

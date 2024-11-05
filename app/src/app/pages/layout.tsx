@@ -1,15 +1,18 @@
 // src/app/layout.tsx
 'use client'; // クライアントコンポーネントとして設定
 
-import { SessionProvider } from "next-auth/react";
+import { SessionContextProvider } from "@/context/SessionContext";
+import { UserContextProvider } from "@/context/UserContext";
 import Header from "@/components/Header"; // Headerをインポート
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-                <SessionProvider>
-                    {/* HeaderをSessionProvider内に配置 */}
-                    <Header />
-                    {children}
-                </SessionProvider>
+        <SessionContextProvider>
+            <UserContextProvider>
+                {/* HeaderをSessionContextProvider内に配置 */}
+                <Header />
+            </UserContextProvider>
+            {children}
+        </SessionContextProvider>
     );
 }
