@@ -1,40 +1,25 @@
 'use client';
 import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 function SignInForm() {
-  const [error, setError] = useState<string | null>(null);
+  const { message, signIn } = useAuth();
 
   const handleSignIn = async (event: any) => {
     event.preventDefault();
-    const email = event.target.email.value;
-    const password = event.target.password.value;
+    const email = event.target.email.value; // メールアドレスを取得
+    const password = event.target.password.value;//パスワードを取得
 
-    console.log("email: ", email);
-    console.log("password: ", password);
-
-    // Supabaseを使ってサインイン
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      // 認証エラーの処理
-      setError(error.message);
-      console.error("Sign-in failed:", error.message);
-    } else {
-      // 認証成功後の処理
-      console.log("Sign-in successful:", data);
-    }
-  };
-
+    signIn(email, password);
+  }
+    
   return (
     <form onSubmit={handleSignIn}>
       <input type="email" name="email" placeholder="Email" required />
       <input type="password" name="password" placeholder="Password" required />
       <button type="submit">Sign In</button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {message && <p style={{ color: 'red' }}>{message}</p>}
     </form>
   );
 }

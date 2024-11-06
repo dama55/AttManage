@@ -1,16 +1,28 @@
 'use client';
+import { UserContextProvider, useUserContext } from "@/contexts/UserContext";
+import { SessionContextProvider } from "@/contexts/SessionContext";
 
-export default function QrCodeLink(props: any) {
-    
-    if (!props.role) {
+export function QrCodeLink({...props}: any) {
+    const {role} = useUserContext();
+
+    if (!role) {
         return <p>こんにちは！まずはログインしましょう！</p>;
     }
 
-    const role = props.role;
 
     if (role === 'Owner' || role === 'Machine') {
         return <a href="/qr">QRコードページ</a>;
     }
 
     return null;
+}
+
+export default function QrCodeLinkWrapper({...props}: any){
+    return (
+        <SessionContextProvider>
+        <UserContextProvider>
+          <QrCodeLink {...props} />
+        </UserContextProvider>
+      </SessionContextProvider>
+    )
 }

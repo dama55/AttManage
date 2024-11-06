@@ -1,69 +1,18 @@
 'use client';
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from '@/lib/supabaseClient'; // Supabaseクライアントをインポート
 import '@/globals.css'; // グローバルCSSのインポート
 import styles from './Header.module.css';
+import { useUserContext, UserContextProvider } from "@/contexts/UserContext";
+import { useSessionContext, SessionContextProvider } from "@/contexts/SessionContext";
 
-export default function Header() {
-    const [session, setSession] = useState<any>(null);
-    const router = useRouter();
-    const [role, setRole] = useState<string | null>(null);
-    const [name, setName] = useState<string | null>(null);
 
-    // Supabaseセッションを取得
-    useEffect(() => {
-        const getSession = async () => {
-            const { data } = await supabase.auth.getSession();
-            setSession(data.session);
-        };
+export function Header() {
+    const { role, name } = useUserContext();
+    const { session, handleSignIn, handleSignOut} = useSessionContext();
 
-        getSession();
-
-        // セッションの変更をリッスン
-        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-            setSession(session);
-        });
-
-        // クリーンアップ
-        // useEffect内で関数をreturnすると，このコンポーネントがアンマウント（削除される）場合にこの関数が実行される
-        return () => {
-            authListener.subscription.unsubscribe();
-        };
-    }, []);
-
-    // ロールを取得するためのAPI呼び出し
-    useEffect(() => {
-        const fetchRole = async () => {
-            if (session?.user) {
-                try {
-                    const response = await fetch(`/api/auth/user`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({id: session.user.id}),
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        setRole(data.role);
-                        setName(data.name);
-                    } else {
-                        console.error("Failed to fetch role");
-                    }
-                } catch (error) {
-                    console.error("Error fetching role:", error);
-                }
-            }
-        };
-
-        fetchRole();
-    }, [session]);
-
-    const handleSignOut = async () => {
-        await supabase.auth.signOut();
-        router.push("/pages/signin");
-    };
+    console.log("role: ", role);
+    console.log("name: ", name);
 
     return (
         <div className={styles.header}>
@@ -74,9 +23,9 @@ export default function Header() {
                         {name ? `${name}さん，こんにちは！` : ""}
                     </span>
                     {session ? (
-                        <button className={styles.logoutButton} onClick={handleSignOut}>ログアウト</button>
+                        <button className={styles.logoutButton} onClick={handleSignOut}>サインアウト</button>
                     ) : (
-                        <button className={styles.loginButton} onClick={() => router.push("/pages/signin")}>ログイン</button>
+                        <button className={styles.loginButton} onClick={handleSignIn}>サインイン</button>
                     )}
                 </div>
                 <div className={styles.roleTitle}>
@@ -91,4 +40,15 @@ export default function Header() {
             <hr className={styles.headerHr} />
         </div>
     );
+}
+
+
+export default function HeaderWrapper(){
+    return (
+        <SessionContextProvider>
+            <UserContextProvider>
+                <Header/>
+            </UserContextProvider>
+        </SessionContextProvider>
+    )
 }

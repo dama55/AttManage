@@ -1,8 +1,11 @@
 'use client';
 import { useState } from 'react';
+import { useAuth } from '@/hooks/auth/useAuth';
+import { emitKeypressEvents } from 'readline';
 
 function SignUpForm() {
-  const [message, setMessage] = useState<string | null>(null);
+  const {message, signUp} = useAuth();
+  // const [message, setMessage] = useState<string | null>(null);
 
   const handleSignUp = async (event: any) => {
     event.preventDefault();
@@ -10,30 +13,7 @@ function SignUpForm() {
     const email = event.target.email.value; // メールアドレスを取得
     const password = event.target.password.value;
 
-    try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ displayName, email, password }),
-      });
-      
-      const responseJson = await response.json();
-
-      if (!response.ok) {
-        // レスポンスをjson変換してエラーメッセージを取得
-        const error = responseJson.error
-        
-        throw new Error(error || 'Sign-up failed');
-      }
-      setMessage(responseJson.message);
-      console.log('Sign-up successful');
-      
-      // ここで成功後の処理を追加
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-      setMessage(errorMessage);
-      console.error('Sign-up failed:', errorMessage);
-    }
+    signUp(displayName, email, password);//カスタムフックを呼び出し
   
   };
 
