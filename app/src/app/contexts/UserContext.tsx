@@ -1,7 +1,8 @@
+'use client';
 // UserContext現在のユーザー情報を保存するコンテキスト
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Session } from '@supabase/supabase-js'; // Supabaseの型をインポート
-import { useSessionContext } from "@/context/SessionContext";
+import { useSessionContext } from "@/contexts/SessionContext";
 
 interface UserContextType {
     name: string | null;
@@ -41,6 +42,7 @@ export function UserContextProvider({ children }: { children: ReactNode }) {
 
         fetchUserDetails();
     }, [session]);
+
 
     return (
         <UserContext.Provider value={{ name, role }}>

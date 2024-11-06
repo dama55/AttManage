@@ -7,23 +7,7 @@ interface User {
     role: string;
 }
 
-export default function EmployeeList() {
-    const [users, setUsers] = useState<User[]>([]);
-
-    useEffect(() => {
-        // APIからユーザー情報を取得
-        const fetchUsers = async () => {
-            try {
-                const response = await fetch('/api/auth/users');
-                const data = await response.json();
-                setUsers(data);
-            } catch (error) {
-                console.error('Error fetching users:', error);
-            }
-        };
-
-        fetchUsers();
-    }, []);
+export default function EmployeeList({...props}) {
 
     return (
         <div>
@@ -37,7 +21,7 @@ export default function EmployeeList() {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map((user) => (
+                    {props.users.map((user:any) => (
                         <tr key={user.userId}>
                             <td>{user.userId}</td>
                             <td>{user.name}</td>

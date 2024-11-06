@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 
+/**
+ * サインアップ処理をまとめたAPI
+ * サインインに関してはフロントから直接実行しているが，
+ * サインアップに関しては，メールアドレスとパスワードをauth.userテーブルに保存しつつ，
+ * ユーザー名をUserテーブルに保存するということをしているため，バックエンドで処理をまとめた．
+ * @param request 
+ * @returns 
+ */
 export async function POST(request: Request) {
   const { email, password, displayName } = await request.json();
 
