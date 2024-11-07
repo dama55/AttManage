@@ -1,0 +1,32 @@
+.dayText {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding-top: 0.5rem;
+}
+
+.celldayoftheweek {
+    border-left: none !important;
+    /* 左の枠線を消す */
+    border-right: none !important;
+    /* 右の枠線を消す */
+}
+
+/* 上のボーダーをなくす処理 */
+.noTopBorder {
+    border-top: none !important;
+    box-shadow: none !important;
+}
+
+/* カレンダー全体の背景色 */
+.calendarBackground {
+    background-color: rgb(241, 241, 239);
+    /* 任意の背景色 */
+}
+
+/* 土日のセルの背景色 */
+.weekendColor {
+    background-color: rgb(247, 247, 245);
+    /* 土日の色 */
+}
