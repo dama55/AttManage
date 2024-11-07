@@ -1,5 +1,6 @@
 // components/server/Employees.ts
 //従業員情報を取り出すサーバーサイドコンポーネント
+import { getAllUsers } from '@/services/userService';
 import React from 'react';
 
 interface User {
@@ -9,18 +10,15 @@ interface User {
 }
 
 export default async function EmployeeListServ({children, ...props}: any) {
+    let users: User[] = [];
     // サーバーサイドで従業員データを取得
-    const fetchEmployees = async (): Promise<User[]> => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/users`, { 
-            cache: 'no-store' // サーバーサイドで常に新しいデータを取得する
-        });
-        if (!response.ok) {
-            throw new Error("Failed to fetch employee data");
-        }
-        return response.json();
-    };
+    try {
+        users = await getAllUsers(); // データベースから直接従業員データを取得
+    } catch (error) {
+        console.error("Failed to load employee data:", error);
+        return <div>Failed to load employee data. Please try again later.</div>;
+    }
 
-    const users = await fetchEmployees(); // データを取得
 
     return (
         <>
