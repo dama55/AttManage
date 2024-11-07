@@ -1,42 +1,27 @@
 'use client';
-import { signIn } from "next-auth/react";
 import { useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 function SignInForm() {
-
-  const [error, setError] = useState<string | null>(null);
+  const { message, signIn } = useAuth();
 
   const handleSignIn = async (event: any) => {
     event.preventDefault();
-    const name = event.target.name.value;
-    const password = event.target.password.value;
+    const email = event.target.email.value; // メールアドレスを取得
+    const password = event.target.password.value;//パスワードを取得
 
-    console.log("name: ", name);
-    console.log("password: ", password);
+    signIn(email, password);
+  }
     
-    // NextAuth.jsを使ってサインイン
-    const result = await signIn("credentials", {
-      redirect: false,
-      name,
-      password,
-    });
-
-    if (result?.error) {
-      // 認証エラーの処理
-      setError(error);
-      console.error("Sign-in failed:", result.error);
-    }
-  };
-
   return (
     <form onSubmit={handleSignIn}>
-      <input type="text" name="name" placeholder="Name" required />
+      <input type="email" name="email" placeholder="Email" required />
       <input type="password" name="password" placeholder="Password" required />
       <button type="submit">Sign In</button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {message && <p style={{ color: 'red' }}>{message}</p>}
     </form>
   );
 }
-
 
 export default SignInForm;

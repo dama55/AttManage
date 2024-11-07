@@ -1,35 +1,18 @@
 'use client';
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { supabase } from '@/lib/supabaseClient'; // Supabaseクライアントをインポート
 import '@/globals.css'; // グローバルCSSのインポート
 import styles from './Header.module.css';
+import { useUserContext, UserContextProvider } from "@/contexts/UserContext";
+import { useSessionContext, SessionContextProvider } from "@/contexts/SessionContext";
 
-export default function Header() {
-    const { data: session } = useSession();
-    const router = useRouter();
-    const [role, setRole] = useState<string | null>(null);
 
-    // ロールを取得するためのAPI呼び出し
-    useEffect(() => {
-        const fetchRole = async () => {
-            if (session?.user.id) {
-                try {
-                    const response = await fetch(`/api/auth/user?id=${session.user.id}`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        setRole(data.role);
-                    } else {
-                        console.error("Failed to fetch role");
-                    }
-                } catch (error) {
-                    console.error("Error fetching role:", error);
-                }
-            }
-        };
+export function Header() {
+    const { role, name } = useUserContext();
+    const { session, handleSignIn, handleSignOut} = useSessionContext();
 
-        fetchRole();
-    }, [session]);
+    console.log("role: ", role);
+    console.log("name: ", name);
 
     return (
         <div className={styles.header}>
@@ -37,12 +20,12 @@ export default function Header() {
                 <div className={styles.loginSection}>
                     {/* ログイン状態に基づいてボタンを切り替える */}
                     <span className={styles.greetingMessage}>
-                        {session ? `${session.user.name}さん，こんにちは！` : ""}
+                        {name ? `${name}さん，こんにちは！` : ""}
                     </span>
                     {session ? (
-                        <button className={styles.logoutButton} onClick={() => signOut()}>ログアウト</button>
+                        <button className={styles.logoutButton} onClick={handleSignOut}>サインアウト</button>
                     ) : (
-                        <button className={styles.loginButton} onClick={() => router.push("/pages/signin")}>ログイン</button>
+                        <button className={styles.loginButton} onClick={handleSignIn}>サインイン</button>
                     )}
                 </div>
                 <div className={styles.roleTitle}>
@@ -57,4 +40,15 @@ export default function Header() {
             <hr className={styles.headerHr} />
         </div>
     );
+}
+
+
+export default function HeaderWrapper(){
+    return (
+        <SessionContextProvider>
+            <UserContextProvider>
+                <Header/>
+            </UserContextProvider>
+        </SessionContextProvider>
+    )
 }
