@@ -1,0 +1,96 @@
+.layout {
+    display: flex;
+    height: 100vh;
+}
+
+.side_peak {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    /* 初期位置は画面外 */
+    /* width: 33%; */
+    height: 100vh;
+    background-color: #f8f8f8;
+    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease;
+    margin-left: 10px;
+    padding-left: 10px;
+    /* スライドアニメーション */
+    overflow-y: auto;
+}
+
+.resize_handle {
+    width: 5px;
+    height: 100%;
+    cursor: ew-resize;
+    background-color:none;
+    position: fixed;
+    top: 0;
+}
+
+
+
+.side_peak.show {
+    right: 0;
+    /* トリガーが有効のときに表示 */
+}
+
+.center_peak {
+    width: 300px;
+    background: #fff;
+    padding: 16px;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+}
+
+.side_peak_content {
+    width: 100%;
+    /* サイドピークの幅に合わせて100%にする */
+    height: 100%;
+    /* 必要に応じて高さも100%に設定 */
+}
+
+.main_content {
+    flex-grow: 1;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+/* サイドピークを閉じるボタン */
+.close_button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    /* アイコンの色を指定 */
+}
+
+/* ボタンホバー時の背景色 */
+.close_button:hover {
+    background-color: rgba(200, 200, 200, 0.5) !important;
+    /* ホバー時の背景色 */
+}
+
+/* ボタンクリック時の背景色 */
+.close_button:active {
+    background-color: rgba(150, 150, 150, 0.8) !important;
+    /* クリック時の背景色 */
+}
+
+/* 矢印アイコンの色設定 */
+.close_button svg {
+    color: rgba(55, 53, 47, 0.5) !important;
+    /* アイコンの色 */
+}
+
+/* サイドピークのヘッダー */
+.side_peak_header{
+    height: 48px;
+    display: flex;
+    padding: 10px;
+}

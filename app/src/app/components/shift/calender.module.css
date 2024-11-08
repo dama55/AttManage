@@ -2,6 +2,7 @@
 
 /* カレンダー全体の背景色 */
 .calendarBackground {
+    width: 100%;
     background-color: rgb(241, 241, 239);
     /* 任意の背景色 */
     border-radius: 12px;
@@ -13,7 +14,6 @@
     border: 1px solid rgb(233, 233, 231);
     /* 必要に応じて枠線を設定 */
     padding: 20px 0px;
-    margin: 0 10px;
 }
 
 /* 曜日などサブのフォント */
