@@ -7,6 +7,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 
 import styles from '@/components/shift/calender.module.css'
 import { useEffect } from 'react';
+import '@/components/shift/calender.css';
 
 const CalendarComponent = () => {
   const handleDateClick = (info) => {
@@ -18,31 +19,36 @@ const CalendarComponent = () => {
     { title: 'Event 2', date: '2024-11-15' },
   ];
 
-  // 土日セルにクラスを適用する関数
-  const applyWeekendStyles = () => {
-    const weekendCells = document.querySelectorAll('.fc-day-sat.fc-daygrid-day, .fc-day-sun.fc-daygrid-day');
-    weekendCells.forEach((cell) => {
-      cell.classList.add(styles.weekendColor);
-    });
+  const getCSSVariable = (name) => {
+    return getComputedStyle(document.documentElement).getPropertyValue(name);
   };
 
-  useEffect(() => {
-    // 曜日ヘッダーセルにcelldayoftheweekクラスを追加
-    const dayOfWeekElements = document.querySelectorAll('.fc-col-header-cell');
-    dayOfWeekElements.forEach((element) => {
-      element.classList.add(styles.celldayoftheweek);
-    });
-    // カレンダーの上部 要素に noTopBorder クラスを追加
-    const scrollGridElement = document.querySelector('.fc-scrollgrid');
-    if (scrollGridElement) {
-      scrollGridElement.classList.add(styles.noTopBorder);
+  // 日付ヘッダーをビューごとにカスタマイズ
+  const formatDayHeader = (info) => {
+    const isToday = info.date.toDateString() === new Date().toDateString();
+    const date = info.date.getDate(); // 日付部分
+    const day = info.date.toLocaleDateString('ja-JP', { weekday: 'short' }); // 曜日（例: 土）
+
+
+    // dayGridMonth ビューでは曜日のみを表示
+    if (info.view.type === 'dayGridMonth') {
+      return <div className={styles.calender_subtle_font}>{day}</div>;
     }
 
+    // timeGridDay ビュー or timeGridWeek ビュー
+    return (
+      <div  style={{ textAlign: 'center'}}>
+        <div className={styles.calender_subtle_font}>{day}</div>
+        <div className={`${styles.calender_day_box} ${styles.calender_main_num_font} ${isToday ? 'day-header-today': ''}`}>{date}</div>
+      </div>
+    );
+
+    return null;
+  };
 
 
-    // 土日セルに色を設定
-    applyWeekendStyles();
-  }, []);
+
+
 
   return (
     <div className={styles.calendarBackground}>
@@ -52,25 +58,29 @@ const CalendarComponent = () => {
         locale="ja"
         events={events}
         dateClick={handleDateClick}
+        buttonText={{
+          today: '今日',
+          month: '月',
+          week: '週',
+          day: '日',
+          list: '予定リスト'
+        }}
         headerToolbar={{
-          left: 'prev,next today',
+          left: 'prev,today,next',
           center: 'title',
           right: 'dayGridMonth,timeGridWeek,timeGridDay',
         }}
-        dayCellContent={(arg) => (
-          <div>
-            {arg.date.getDate()}
-          </div>
-        )}
-        dayCellDidMount={(info) => {
-          const dayNumberElement = info.el.querySelector('.fc-daygrid-day-top');
-          if (dayNumberElement) {
-            dayNumberElement.classList.add(styles.dayText); // CSSモジュールのクラスを適用
+        dayCellContent={(arg) => {
+          if (arg.view.type === 'dayGridMonth') {
+            return <div className='day_target month-view'>{arg.date.getDate()}</div>;
           }
+          return null;
         }}
-        viewDidMount={applyWeekendStyles} // ビュー切り替え後に土日スタイルを再適用
-        datesSet={applyWeekendStyles}     // 日付範囲が更新されるたびに土日スタイルを再適用
+        allDayText="担当者"
+        // timeGridWeek ビューでのみカスタム曜日ヘッダーを適用
+        dayHeaderContent={formatDayHeader}
       />
+
     </div>
   );
 };

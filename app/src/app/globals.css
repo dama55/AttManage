@@ -15,6 +15,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* フォントサイズの指定 */
+  --font-size-small: 12px;
+  --font-size-medium: 16px;
+  --font-size-large: 20px;
+  --font-size-xlarge: 24px;
+  --font-size-xxlarge: 28px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,6 +50,7 @@ body {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  border-color: rgb(233, 233, 231) !important;
 }
 
 a {
@@ -55,3 +63,25 @@ a {
     color-scheme: dark;
   }
 }
+
+/* スクロールバー全体の幅を指定 */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+/* スクロールバーの背景色を設定 */
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* スクロールバーのトラック（背景色） */
+}
+
+/* スクロールバーのつまみの色を設定 */
+::-webkit-scrollbar-thumb {
+  background-color: #888; /* つまみの色 */
+  border-radius: 6px;     /* 角を丸くする */
+}
+
+/* ホバー時のつまみの色を変更 */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
