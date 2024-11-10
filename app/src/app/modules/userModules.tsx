@@ -1,4 +1,4 @@
-// src/app/services/userService.ts
+// src/app/modules/userModules.ts
 import { supabase } from '@/lib/supabaseClient';
 
 export async function getAllUsers() {
