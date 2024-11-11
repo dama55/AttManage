@@ -1,59 +1,47 @@
-'use client';
 // hooks/useAuth.ts
-//サインアップは頻繁に使わないので，カスタムフックにまとめる
-import { useState } from 'react';
+'use client';
 import { supabase } from '@/lib/supabaseClient';
+import { useAsyncWithErrorHandling } from '@/hooks/useAsyncWithErrorHandling'
 
 interface AuthResponse {
-    message: string;
-    error?: string;
+  message: string;
+  error?: string;
 }
 
 export function useAuth() {
-    const [message, setMessage] = useState<string | null>(null);
+  const { result: message, error, loading, executeAsyncFunction } = useAsyncWithErrorHandling<string>();
 
-    //一旦バックエンドを介してsupabaseを呼び出す
-    const signUp = async (displayName: string, email: string, password: string) => {
-        try {
-            const response = await fetch('/api/auth/signup', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ displayName, email, password }),
-            });
+  // サインアップ関数
+  const signUp = (displayName: string, email: string, password: string) =>
+    executeAsyncFunction(async () => {
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ displayName, email, password }),
+      });
 
-            const responseJson: AuthResponse = await response.json();
+      const responseJson: AuthResponse = await response.json();
 
-            if (!response.ok) {
-                throw new Error(responseJson.error || 'Sign-up failed');
-            }
-            setMessage(responseJson.message);
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-            setMessage(errorMessage);
-        }
-    };
+      if (!response.ok) {
+        throw new Error(responseJson.error || 'Sign-up failed');
+      }
+      return responseJson.message;
+    });
 
-    //フロントから直接supabase APIを呼び出し
-    const signIn = async (email: string, password: string) => {
-        try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
+  // サインイン関数
+  const signIn = (email: string, password: string) =>
+    executeAsyncFunction(async () => {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-            if (error) {
-                throw new Error(error.message);
-            }
-            setMessage("Sign-in successful");
-            console.log("Sign-in successful:", data);
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-            setMessage(errorMessage);
-            console.error("Sign-in failed:", errorMessage);
-        }
-    };
+      if (error) {
+        throw new Error(error.message);
+      }
+      console.log("Sign-in successful:", data);
+      return "Sign-in successful";
+    });
 
-
-
-    return { message, signUp, signIn };
+  return { message, error, loading, signUp, signIn };
 }

@@ -13,10 +13,9 @@ export default function Home() {
         <span>事業所名称:</span>
         <span>開発用テスト事業所</span>
       </div>
-      
       <EmployeeListServ>
         <EmployeeList/>  
-      </EmployeeListServ> {/* 従業員一覧を表示するコンポーネント */}
+      </EmployeeListServ>
       {/* role を props として QrCodeLink に渡す */}
       <QrCodeLinkWrapper />
 
