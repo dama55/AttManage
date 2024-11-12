@@ -50,16 +50,26 @@ const CalendarComponent = ({events, setEvents, isEditable}) => {
 
   /* 現状のカレンダーの状態が編集可能なのかどうかを判定 */
   const editableCheck = () => {
-    let result = true;
     if (!isEditable){
+      console.log(is)
       return false
     }
 
-    const { month, year } = getCurrentMonth();
+    const currentMonth = getCurrentMonth();
 
-    if (month !== editableMonth.month || year !== editableMonth.year) {
+    if (currentMonth.month == null || currentMonth.year == null){
+      //取得した月がnullの場合は編集できない
+      console.log("currentMonthがnullになっている")
       return false;
     }
+
+    console.log("editableMonth: ", editableMonth);
+    console.log("currentMonth: ", currentMonth);
+    if (currentMonth.month !== editableMonth.month || currentMonth.year !== editableMonth.year) {
+      return false;
+    }
+
+    return true;
   }
 
 
@@ -133,14 +143,17 @@ const CalendarComponent = ({events, setEvents, isEditable}) => {
 
   // 月が変更されたときに呼ばれる関数
   const handleDatesSet = () => {
-    const { month, year } = getCurrentMonth();
-    setEditableMonth({ month, year }); // 表示される月を更新
+    const currentMonth = getCurrentMonth();
+    console.log("currentMonth: ", currentMonth);
+    if (currentMonth){
+      setEditableMonth(currentMonth); // 表示される月を更新
+    }
   };
 
   // useEffectでカレンダーがレンダリングされた後に初期化
   useEffect(() => {
     const currentMonth = getCurrentMonth();
-    if (currentMonth) {
+    if (currentMonth) {// currentMonthがnullの時にはセットしない
       setEditableMonth(currentMonth);
     }
   }, []);
