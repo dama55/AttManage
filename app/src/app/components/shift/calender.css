@@ -1,5 +1,3 @@
-
-
 /* タイトルのスタイル */
 .fc-toolbar-title {
     font-weight: normal;
@@ -52,7 +50,10 @@
     /* 丸くする */
     padding: 4px 8px;
     /* サイズ調整 */
-    display: inline-block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
     font-weight: bold;
     /* フォントを強調 */
 }
@@ -129,3 +130,31 @@
     color: rgba(55, 53, 47, 0.5) !important;
     /* 矢印色 */
 }
+
+/* イベントデザイン */
+.fc-event {
+    border-radius: 5px !important;
+    overflow: hidden;
+    padding: 2px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2) !important;
+    transition: box-shadow 0.3s ease;
+    border: none;
+}
+
+.fc-event:hover {
+    box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
+    opacity: 0.9;
+    scale: 1.01;
+    /* マウスオーバー時の影を強調 */
+}
+
+.fc-event:focus,
+.fc-event:active {
+    color: black !important;
+    /* フォーカス状態でも文字色が黒 */
+    background-color: #e0e0e0 !important;
+    /* フォーカス背景色を変更 */
+}   
+
+
+.fc-event-hilight {}

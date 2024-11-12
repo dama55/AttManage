@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 import { error } from 'console';
-import { getAllUsers } from '@/services/userService';
+import { getAllUsers } from '@/modules/userModules';
 
 export async function GET(request: Request) {
 

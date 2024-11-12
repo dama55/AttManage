@@ -1,10 +1,10 @@
 'use client';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRootLayout, RootLayoutProvider } from '@/contexts/RootLayoutContext';
 import CalendarComponent from '@/components/shift/calender';
 import EmployeeList from '@/components/employee/Employees';
 
-export function ExamplePage() {
+export default function ExamplePage() {
   const { sidePeakContent, setSidePeakContent, setPopUpContent } = useRootLayout();
 
   const handleClick = () => {
@@ -23,17 +23,10 @@ export function ExamplePage() {
   );
 }
 
-export default function ExamplePageWrapper() {
-  return (
-    <RootLayoutProvider>
-      <ExamplePage />
-    </RootLayoutProvider>
-  );
-}
-
 function SideContentComponent() {
+  const [events, setEvents] = useState([]);
   return <div>
-    <CalendarComponent />
+    <CalendarComponent events={events} setEvents={setEvents} isEditable={true}/>
     <div>
       <h2>サイドピークのテーブル</h2>
       <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid black' }}>

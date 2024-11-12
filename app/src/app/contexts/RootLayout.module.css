@@ -36,6 +36,7 @@
 }
 
 .center_peak {
+    display: none;
     width: 300px;
     background: #fff;
     padding: 16px;

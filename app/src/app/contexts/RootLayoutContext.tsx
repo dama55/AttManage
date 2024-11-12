@@ -29,7 +29,7 @@ type RootLayoutProviderProps = {
 export function RootLayoutProvider({ children }: RootLayoutProviderProps) {
   const [sidePeakContent, setSidePeakContent] = useState<React.ReactNode>(null);
   const [popUpContent, setPopUpContent] = useState<React.ReactNode>(null);
-  const [sidePeakWidth, setSidePeakWidth] = useState(window.innerWidth * 0.25); // 初期幅
+  const [sidePeakWidth, setSidePeakWidth] = useState(0); // 初期幅
 
   /* ページがアンマウントされる際にコンテンツをリセットする */
   const contextValue = {
@@ -41,6 +41,11 @@ export function RootLayoutProvider({ children }: RootLayoutProviderProps) {
 
   // コンテキストがアンマウントされるときにコンテンツをリセット
   useEffect(() => {
+
+    if (typeof window !== 'undefined') {
+      setSidePeakWidth(window.innerWidth * 0.25);
+    }
+
     return () => {
       setSidePeakContent(null);
       setPopUpContent(null);

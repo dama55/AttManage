@@ -20,7 +20,7 @@ export function UserContextProvider({ children }: { children: ReactNode }) {
         const fetchUserDetails = async () => {
             if (session?.user) {
                 try {
-                    const response = await fetch('/api/auth/user', {
+                    const response = await fetch('/api/user', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
