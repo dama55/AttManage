@@ -17,6 +17,7 @@
     padding-left: 10px;
     /* スライドアニメーション */
     overflow-y: auto;
+    z-index: 3;
 }
 
 .resize_handle {

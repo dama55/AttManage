@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
 import '@/globals.css';
 import styles from '@/contexts/RootLayout.module.css';
 import { SlArrowRight } from "react-icons/sl"; // アイコンをインポート
@@ -10,6 +10,7 @@ type LayoutContextType = {
   setPopUpContent: (content: React.ReactNode) => void;
   sidePeakContent: React.ReactNode;
   popUpContent: React.ReactNode;
+  setSidePeakFlag: Dispatch<SetStateAction<boolean>>;
 };
 
 
@@ -30,6 +31,7 @@ export function RootLayoutProvider({ children }: RootLayoutProviderProps) {
   const [sidePeakContent, setSidePeakContent] = useState<React.ReactNode>(null);
   const [popUpContent, setPopUpContent] = useState<React.ReactNode>(null);
   const [sidePeakWidth, setSidePeakWidth] = useState(0); // 初期幅
+  const [sidePeakFlag, setSidePeakFlag] = useState(false);
 
   /* ページがアンマウントされる際にコンテンツをリセットする */
   const contextValue = {
@@ -37,6 +39,7 @@ export function RootLayoutProvider({ children }: RootLayoutProviderProps) {
     setPopUpContent,
     sidePeakContent,
     popUpContent,
+    setSidePeakFlag,
   };
 
   // コンテキストがアンマウントされるときにコンテンツをリセット
@@ -85,20 +88,20 @@ export function RootLayoutProvider({ children }: RootLayoutProviderProps) {
     <LayoutContext.Provider value={contextValue}>
       <div className={styles.layout}>
         {/* サイドピーク */}
-        <aside className={`${styles.side_peak} ${sidePeakContent ? styles.show : ''}`}
+        <aside className={`${styles.side_peak} ${sidePeakFlag ? styles.show : ''}`}
         style={{ width: `${sidePeakWidth}px` }}>
           {/* リサイズハンドル */}
           <div
-            className={`${styles.resize_handle} ${sidePeakContent ? styles.show : ''}`}
+            className={`${styles.resize_handle} ${sidePeakFlag ? styles.show : ''}`}
             onMouseDown={handleMouseDown}
             style={{
-              right: `${sidePeakContent ? sidePeakWidth : -1000}px`,
+              right: `${sidePeakFlag ? sidePeakWidth : -1000}px`,
             }} /* サイドピークの幅に応じて配置 */
           />
           
           <div className={styles.side_peak_header}>
             {/* CustomButtonを使って閉じるボタンを作成 */}
-            <CustomButton onClick={() => setSidePeakContent(null)}>
+            <CustomButton onClick={() => setSidePeakFlag(false)}>
               <SlArrowRight size={24} />
             </CustomButton>
           </div>

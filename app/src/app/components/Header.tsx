@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabaseClient'; // Supabaseクライアント�
 import '@/globals.css'; // グローバルCSSのインポート
 import styles from './Header.module.css';
 import { useUserContext, UserContextProvider } from "@/contexts/UserContext";
-import { useSessionContext, SessionContextProvider } from "@/contexts/SessionContext";
+import { useSessionContext } from "@/contexts/SessionContext";
 
 
 export function Header() {
@@ -45,10 +45,8 @@ export function Header() {
 
 export default function HeaderWrapper(){
     return (
-        <SessionContextProvider>
-            <UserContextProvider>
-                <Header/>
-            </UserContextProvider>
-        </SessionContextProvider>
+        <UserContextProvider>
+            <Header/>
+        </UserContextProvider>
     )
 }

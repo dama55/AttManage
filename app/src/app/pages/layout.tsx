@@ -4,6 +4,7 @@ import HeaderWrapper from "@/components/Header"; // Headerをインポート
 import EmployeeListServ from "@/components/server/EmployeeListServ";
 import { layoutConfig } from "@/pages/layoutConfig";
 import { RootLayoutProvider } from '@/contexts/RootLayoutContext';
+import { SessionContextProvider } from '@/contexts/SessionContext';
 
 export default function RootLayout({ 
     children,
@@ -13,10 +14,12 @@ export default function RootLayout({
 
     return (
         <>
-            <HeaderWrapper />
-            <RootLayoutProvider>
-                {children}
-            </RootLayoutProvider>
+            <SessionContextProvider>
+                <HeaderWrapper />
+                <RootLayoutProvider>
+                    {children}
+                </RootLayoutProvider>
+            </SessionContextProvider>
         </>
     );
 }

@@ -2,8 +2,8 @@
 interface timeData {
     'id': Number,
     'userId': string,
-    'start': Date,
-    'end': Date,
+    'start': string,
+    'end': string,
 }
 
 export function makeShiftDelAndAdd( preData: timeData[], newData: timeData[]){
@@ -38,8 +38,8 @@ function splitInto30MinIntervals(dataArray: timeData[]) {
         splitData.push({
           id: Math.floor(Math.random() * 9000000) + 1000000, //再び仮のIDを割り振る
           userId,
-          start: new Date(startTime),
-          end: new Date(intervalEnd),
+          start: startTime.toISOString(),
+          end: intervalEnd.toISOString(),
         });
   
         // 次の30分区切りへ
@@ -60,12 +60,12 @@ function findDelAndAdd(preData: timeData[], newData: timeData[]) {
     // 新旧のシフトデータを比較するため、Mapを使用
     const preDataMap = new Map<string, timeData>();
     preData.forEach(item => {
-        const key = `${item.start.getTime()}-${item.end.getTime()}-${item.userId}`;
+        const key = `${new Date(item.start).getTime()}-${new Date(item.end).getTime()}-${item.userId}`;
         preDataMap.set(key, item);
     });
 
     newData.forEach(item => {
-        const key = `${item.start.getTime()}-${item.end.getTime()}-${item.userId}`;
+        const key = `${new Date(item.start).getTime()}-${new Date(item.end).getTime()}-${item.userId}`;
         
         // 新しいデータに存在するが、古いデータにない場合は追加されたデータ
         if (!preDataMap.has(key)) {

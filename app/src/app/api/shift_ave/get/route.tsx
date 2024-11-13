@@ -26,5 +26,5 @@ export const POST = withErrorHandling(async (req: Request) => {
     
 
     // 成功レスポンスを返す
-    return NextResponse.json({ message: '操作が成功しました', result });
+    return NextResponse.json({ message: '操作が成功しました', data: result });
 });

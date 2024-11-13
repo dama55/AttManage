@@ -10,6 +10,9 @@ export function withErrorHandling(fn: AsyncFunction) {
       return await fn(...args);
     } catch (err: unknown) {
       if (err instanceof Error) {
+        console.error(`Error: ${err.message}`);
+        console.error(`Stack trace:\n${err.stack}`);
+
         return NextResponse.json({ error: err.message }, { status: 500 });
       } else {
         return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });

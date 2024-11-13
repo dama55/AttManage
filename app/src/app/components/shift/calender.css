@@ -28,6 +28,23 @@
     /* 土日の色 */
 }
 
+/* 編集状態で無効化されたセルのデザイン */
+.fc-day-disabled{
+    background-color: rgb(241, 241, 239) !important;
+}
+
+/* 編集状態で無効化されたセルを暗くするデザイン */
+.fc-day-disabled::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.2); /* 半透明の黒 */
+    z-index: 3; /* ダイアログの後ろに配置 */
+  }
+
 /* カレンダー上部のスタイル */
 .fc-scrollgrid {
     /* カレンダーの上のボーダーをなくす */
@@ -156,5 +173,3 @@
     /* フォーカス背景色を変更 */
 }   
 
-
-.fc-event-hilight {}

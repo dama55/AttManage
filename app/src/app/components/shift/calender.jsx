@@ -7,11 +7,26 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 
 import styles from '@/components/shift/calender.module.css'
 import '@/components/shift/calender.css';
+import { useSessionContext } from '@/contexts/SessionContext';
 
-const CalendarComponent = ({events, setEvents, isEditable}) => {
+const CalendarComponent = ({
+  events,
+  setEvents,
+  isEditable,
+  editableMonth,
+  setEditableMonth,
+  initialView = 'dayGridMonth', //日付ビューを初期値に
+  initialDate = new Date().toISOString(),
+  handleDateClickActions = (clickedDate) => {},
+  headerToolbar = {
+    left: 'prev,today,next',
+    center: 'title',
+    right: 'dayGridMonth,timeGridWeek,timeGridDay',
+  },
+}) => {
   // const [events, setEvents] = useState([]);
   const calendarRef = useRef(null);
-  const [editableMonth, setEditableMonth] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
+  const { session } = useSessionContext();
 
   // 現在の表示月と年を取得
   const getCurrentMonth = () => {
@@ -32,6 +47,7 @@ const CalendarComponent = ({events, setEvents, isEditable}) => {
     } else {
       const newEvent = {
         id: Math.floor(Math.random() * 9000000) + 1000000, //一時IDを付加する 
+        userId: session.user.id,
         start: info.start,
         end: info.end,
         allDay: false,
@@ -50,21 +66,19 @@ const CalendarComponent = ({events, setEvents, isEditable}) => {
 
   /* 現状のカレンダーの状態が編集可能なのかどうかを判定 */
   const editableCheck = () => {
-    if (!isEditable){
-      console.log(is)
+    if (!isEditable) {
+      console.log("isEditable: ", isEditable);
       return false
     }
 
     const currentMonth = getCurrentMonth();
 
-    if (currentMonth.month == null || currentMonth.year == null){
+    if (currentMonth.month == null || currentMonth.year == null) {
       //取得した月がnullの場合は編集できない
       console.log("currentMonthがnullになっている")
       return false;
     }
 
-    console.log("editableMonth: ", editableMonth);
-    console.log("currentMonth: ", currentMonth);
     if (currentMonth.month !== editableMonth.month || currentMonth.year !== editableMonth.year) {
       return false;
     }
@@ -75,15 +89,43 @@ const CalendarComponent = ({events, setEvents, isEditable}) => {
 
   // イベントのサイズ変更を処理
   const handleEventResize = (resizeInfo) => {
-    if (!isEditable){
+    if (!isEditable) {
       return;
     }
     const { event } = resizeInfo;
-    const updatedEvents = events.map((ev) =>
-      ev.id === event.id ? { ...ev, start: event.start, end: event.end } : ev
-    );
+
+    const updatedEvents = events.map((ev) => {
+      if (ev.id === Number(event.id)) {
+        return { ...ev, start: new Date(event.start), end: new Date(event.end) };
+      } else {
+        return { ...ev };
+      }
+    });
+    setEvents(updatedEvents);
+    // setEvents(updatedEvents);
+    // resizeInfo.view.calendar.unselect();
+  };
+
+  /* イベントドロップ時の挙動を決定 */
+  const handleEventDrop = (dropInfo) => {
+    if (!isEditable) {
+      return;
+    }
+    //ドロップしたイベントを取り出し
+    const { event } = dropInfo;
+    const updatedEvents = events.map((ev) => {
+      //編集したイベントのデータを更新
+      if (ev.id === Number(event.id)) {
+        return { ...ev, start: new Date(event.start), end: new Date(event.end) };
+      } else {
+        return { ...ev };
+      }
+    });
+
     setEvents(updatedEvents);
   };
+
+
 
 
 
@@ -122,9 +164,24 @@ const CalendarComponent = ({events, setEvents, isEditable}) => {
 
 
   const selectAllowHandler = (Info) => {
-    if (!editableCheck()){
+    //編集状態じゃないなら選択できない
+    if (!isEditable) {
       return false;
     }
+
+    const selectedStartMonth = Info.start.getMonth() + 1; // 選択された開始日付の月（1月 = 1、2月 = 2 ...）
+    const selectedStartYear = Info.start.getFullYear(); // 選択された開始日付の年
+    const selectedEndMonth = Info.end.getMonth() + 1; // 選択された開始日付の月（1月 = 1、2月 = 2 ...）
+    const selectedEndYear = Info.end.getFullYear(); // 選択された開始日付の年
+
+    //選択範囲のどこかが別の月にかぶっているならセレクトできない
+    if ((selectedStartMonth !== editableMonth.month || selectedStartYear !== editableMonth.year) ||
+      (selectedEndMonth !== editableMonth.month || selectedEndYear !== editableMonth.year)) {
+      return false;
+    }
+
+
+
     const newEvent = {
       start: Info.start,
       end: Info.end,
@@ -135,28 +192,51 @@ const CalendarComponent = ({events, setEvents, isEditable}) => {
 
   // 日付クリックを特定の月以外では無効にする
   const handleDateClick = (info) => {
-    if (!editableCheck()) {
-      alert("この月は編集できません。");
-      return;
-    }
+    console.log("handleDateClick was called !!!");
+    console.log("info.dateStr: ", info.dateStr);
+    handleDateClickActions(info.dateStr);
   };
 
   // 月が変更されたときに呼ばれる関数
   const handleDatesSet = () => {
-    const currentMonth = getCurrentMonth();
-    console.log("currentMonth: ", currentMonth);
-    if (currentMonth){
-      setEditableMonth(currentMonth); // 表示される月を更新
+    if (!isEditable) {
+      const currentMonth = getCurrentMonth();
+
+      // 現在の editableMonth と異なる場合のみ更新
+      if (
+        currentMonth &&
+        (!editableMonth || currentMonth.month !== editableMonth.month || currentMonth.year !== editableMonth.year)
+      ) {
+        setEditableMonth(currentMonth);
+      }
     }
   };
 
-  // useEffectでカレンダーがレンダリングされた後に初期化
+  // isEditableの値が更新される場合とページマウント時に，
   useEffect(() => {
-    const currentMonth = getCurrentMonth();
-    if (currentMonth) {// currentMonthがnullの時にはセットしない
-      setEditableMonth(currentMonth);
+    if (!isEditable) { // isEditableがfalseのときのみ実行
+      const currentMonth = getCurrentMonth();
+      if (currentMonth) { // currentMonthがnullでない場合のみ設定
+        // setEditableMonth(currentMonth);
+      }
     }
-  }, []);
+  }, [isEditable]);
+
+
+  // 表示可能期間を表示
+  const computeValidRange = () => {
+    if (isEditable && editableMonth) {
+      const { year, month } = editableMonth;
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0); // 月の最終日
+      return {
+        start: startDate,
+        end: endDate,
+      };
+    }
+    return {};// 編集状態じゃないときは制限しない
+  };
+
 
   return (
     <>
@@ -166,7 +246,8 @@ const CalendarComponent = ({events, setEvents, isEditable}) => {
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           ref={calendarRef}
-          initialView="dayGridMonth"
+          initialView={initialView}
+          initialDate={initialDate}
           locale="ja"
           events={events}
           selectable={isEditable}
@@ -176,10 +257,12 @@ const CalendarComponent = ({events, setEvents, isEditable}) => {
           selectAllow={selectAllowHandler} //セレクトそのものが許可されるかどうか
           eventResizableFromStart={true} // イベントの開始時間もリサイズ可能に
           eventResize={handleEventResize} // イベントのリサイズハンドラ
+          eventDrop={handleEventDrop}
           eventOverlap={false}
           slotEventOverlap={false}
           dateClick={handleDateClick} //クリックした月が編集可能かを判定
           datesSet={handleDatesSet} //クリックした月を記録
+          validRange={computeValidRange()} //表示可能領域を設定
           eventContent={(arg) => (
             <div className={styles.event_block}>
               <div>{arg.timeText}</div> {/* 開始時間と終了時間 */}
@@ -192,18 +275,15 @@ const CalendarComponent = ({events, setEvents, isEditable}) => {
             day: '日',
             list: '予定リスト'
           }}
-          headerToolbar={{
-            left: 'prev,today,next',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay',
-          }}
+          headerToolbar={headerToolbar}
+          allDayText="担当者"
           dayCellContent={(arg) => {
+            //今日の日付を赤い丸で表示
             if (arg.view.type === 'dayGridMonth') {
               return <div className='day_target month-view'>{arg.date.getDate()}</div>;
             }
             return null;
           }}
-          allDayText="担当者"
           // timeGridWeek ビューでのみカスタム曜日ヘッダーを適用
           dayHeaderContent={formatDayHeader}
         />
