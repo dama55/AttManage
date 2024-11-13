@@ -6,11 +6,12 @@ import { UUID } from 'crypto';
 import { responseCookiesToRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
 interface ShiftResponse {
+    data: ShiftData[];
     message: string;
     error?: string;
 }
 
-interface ShiftData {
+export interface ShiftData {
     id: number,
     userId: string,
     start: string,
@@ -19,10 +20,10 @@ interface ShiftData {
 
 
 export function useShiftAve() {
-    const { result, error, loading, executeAsyncFunction } = useAsyncWithErrorHandling<string>();
+    const { result, error, loading, executeAsyncFunction } = useAsyncWithErrorHandling<ShiftResponse>();
 
     // サインアップ関数
-    const getShiftAve = (userId: string, getStart: string, getEnd: string) =>
+    const getShiftAve = (userId: string, getStart: Date, getEnd: Date) =>
         executeAsyncFunction(async () => {
             const response = await fetch('/api/shift_ave/get', {
                 method: 'POST',
@@ -35,7 +36,9 @@ export function useShiftAve() {
             if (!response.ok) {
                 throw new Error(responseJson.error || 'getShiftAve failed');
             }
-            return responseJson.message;
+            console.log("Successfully returend result");
+            console.log("responseJson: ", responseJson);
+            return responseJson;
         });
 
     const editShiftAve = (deleteStart: string, deleteEnd: string, preData: ShiftData[], newData: ShiftData[]) =>
@@ -51,7 +54,7 @@ export function useShiftAve() {
             if (!response.ok){
                 throw new Error(responseJson.error || 'editShiftAve failed');
             }
-            return responseJson.message;
+            return responseJson;
         });
 
 

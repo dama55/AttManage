@@ -22,11 +22,13 @@ export function useAsyncWithErrorHandling<T>() {
             //resultはレスポンスをそのままいれる．エラーはなし
             const result = await asyncFunction();
             setState({ result, error: null, loading: false });
+            return result; //成功時の結果はresultとして返す
         } catch (err) {
             //エラーが発生したら，resultは設定せずerrorのみを設定．
             const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
             setState({ result: null, error: errorMessage, loading: false });
             console.error("Error:", errorMessage);
+            return null; //失敗時の結果はnull
         }
     };
 
