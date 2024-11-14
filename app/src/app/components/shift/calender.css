@@ -29,8 +29,9 @@
 }
 
 /* 編集状態で無効化されたセルのデザイン */
-.fc-day-disabled{
+.fc-day-disabled {
     background-color: rgb(241, 241, 239) !important;
+    position: relative;
 }
 
 /* 編集状態で無効化されたセルを暗くするデザイン */
@@ -41,9 +42,11 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.2); /* 半透明の黒 */
-    z-index: 3; /* ダイアログの後ろに配置 */
-  }
+    background-color: rgba(0, 0, 0, 0.1);
+    /* 半透明の黒 */
+    z-index: 3;
+    /* ダイアログの後ろに配置 */
+}
 
 /* カレンダー上部のスタイル */
 .fc-scrollgrid {
@@ -149,27 +152,67 @@
 }
 
 /* イベントデザイン */
-.fc-event {
+
+.reqShift {
+    background-color: #66CDAA;
+    /* ミントティール */
+    color: #FFFFFF;
     border-radius: 5px !important;
-    overflow: hidden;
+    /* overflow: hidden; */
     padding: 2px;
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2) !important;
     transition: box-shadow 0.3s ease;
     border: none;
+    position: relative;
 }
 
-.fc-event:hover {
+.reqShift:hover {
+    background-color: #66CDAA;
+    /* ミントティール */
+    color: #FFFFFF;
     box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
     opacity: 0.9;
     scale: 1.01;
-    /* マウスオーバー時の影を強調 */
 }
 
-.fc-event:focus,
-.fc-event:active {
-    color: black !important;
-    /* フォーカス状態でも文字色が黒 */
-    background-color: #e0e0e0 !important;
-    /* フォーカス背景色を変更 */
-}   
+.reqShift:focus,
+.reqShift:active {
+    background-color: #66CDAA;
+    /* ミントティール */
+    color: #FFFFFF;
+    box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
+    opacity: 0.8;
+    scale: 0.98;
+}
 
+.aveShift {
+    background-color: #6495ED;
+    /* スカイブルー */
+    color: #FFFFFF;
+    border-radius: 5px !important;
+    /* overflow: hidden; */
+    padding: 2px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2) !important;
+    transition: box-shadow 0.3s ease;
+    border: none;
+    position: relative;
+}
+
+.aveShift:hover {
+    background-color: #6495ED;
+    /* スカイブルー */
+    color: #FFFFFF;
+    box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
+    opacity: 0.9;
+    scale: 1.01;
+}
+
+.aveShift:focus,
+.aveShift:active {
+    background-color: #6495ED;
+    /* スカイブルー */
+    color: #FFFFFF;
+    box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
+    opacity: 0.8;
+    scale: 0.98;
+}

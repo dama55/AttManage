@@ -57,12 +57,12 @@ function AveShiftPage() {
     },
   }
 
-  
-  
+
+
   //サイドピークでのコンポーネントを表示する関数
   const handleDateClickActions = (clickedDate: string) => {
-    if (isEditable){//一旦editableでは何もしないようにする
-      return ;
+    if (isEditable) {//一旦editableでは何もしないようにする
+      return;
     }
     console.log("SidePeak was set!!!");
     console.log("sideProps on SidePeak:", sideProps);
@@ -72,9 +72,9 @@ function AveShiftPage() {
     setSidePeakContent(
       <CalendarComponent {...sideProps} />
     );
-    
+
   };
-  
+
   const props = {
     ...baseProps,
     handleDateClickActions: handleDateClickActions,
@@ -84,12 +84,12 @@ function AveShiftPage() {
       right: 'dayGridMonth,timeGridWeek',
     },
   }
-  
+
   // editableMonth表示される月の値 or 編集か閲覧の切り替えが更新されると，データベースからデータを再取得する．
   useEffect(() => {
     let getStart: Date;
     let getEnd: Date;
-    
+
     if (isEditable) {
       const { month, year } = editableMonth;
       getStart = new Date(year, month - 1, 1); // 月の初日
@@ -99,7 +99,7 @@ function AveShiftPage() {
       // 前後一週間のデータを取得するために日付を調整
       getStart = new Date(year, month - 1, 1);
       getStart.setDate(getStart.getDate() - 7); // 一週間前
-    
+
       getEnd = new Date(year, month, 0);
       getEnd.setDate(getEnd.getDate() + 7); // 一週間後
     }
@@ -113,10 +113,17 @@ function AveShiftPage() {
         // 非同期処理を実行して結果を取得
         const response = await getShiftAve(session.user.id, getStart, getEnd);
         console.log("response: ", response);
-        if(response !== null){
-          console.log("response.result: ", response.data); 
-          setEvents(response.data);
-          setPreEvents(response.data);
+        if (response !== null) {
+          console.log("response.result: ", response.data);
+
+          //各シフトに色とクラス名を指定
+          const updatedEvents = response.data.map(event => ({
+            ...event,
+            color: '#6495ED', // ミントティール
+            className: 'aveShift'
+          }));
+          setEvents(updatedEvents);
+          setPreEvents(updatedEvents);
         }
       }
     };

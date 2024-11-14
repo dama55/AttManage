@@ -53,7 +53,7 @@ export async function deleteAndInsertReqshift(
         });
 
     if (error) {
-        console.error("Error in delete_and_insert_shifts:", error);
+        console.error("Error in delete_and_insert_req_shifts:", error);
         throw new Error(error.message);
     }
 
@@ -89,11 +89,11 @@ export async function getShiftAve(
     return results;
 }
 
-export async function getShiftReqAve(
+export async function getShiftReq(
     getStart: string, //開始区間
     getEnd: string, //終わり区間
 ) {
-    console.log("function getShiftAve");
+    console.log("function getShiftReq");
     console.log("getStart:", getStart);
     console.log("getEnd:", getEnd);
     
@@ -102,7 +102,7 @@ export async function getShiftReqAve(
     const str_getStart = getStart;
     const str_getEnd = getEnd;
     const { data: results, error } = await supabase
-        .from('Shift_Ava')
+        .from('Shift_Req')
         .select('*')
         .gte('start', str_getStart)
         .lte('end', str_getEnd);

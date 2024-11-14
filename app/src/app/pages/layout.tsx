@@ -5,6 +5,7 @@ import EmployeeListServ from "@/components/server/EmployeeListServ";
 import { layoutConfig } from "@/pages/layoutConfig";
 import { RootLayoutProvider } from '@/contexts/RootLayoutContext';
 import { SessionContextProvider } from '@/contexts/SessionContext';
+import styles from '@/pages/styles.module.css';
 
 export default function RootLayout({ 
     children,
@@ -17,7 +18,9 @@ export default function RootLayout({
             <SessionContextProvider>
                 <HeaderWrapper />
                 <RootLayoutProvider>
-                    {children}
+                    <main className={styles.main}>
+                        {children}
+                    </main>
                 </RootLayoutProvider>
             </SessionContextProvider>
         </>

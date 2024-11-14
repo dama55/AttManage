@@ -13,7 +13,6 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
 
   /* フォントサイズの指定 */
   --font-size-small: 12px;
@@ -23,13 +22,7 @@
   --font-size-xxlarge: 28px;
 }
 
-/* ダークモードの背景色・文字色調整 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #f1f1f1; /* より明るい色で文字が読みやすくなる */
-  }
-}
+
 
 html,
 body {
@@ -57,12 +50,6 @@ a {
   text-decoration: none;
 }
 
-/* ダークモードのカラー設定 */
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
 
 /* スクロールバー全体の幅 */
 ::-webkit-scrollbar {
