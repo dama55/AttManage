@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
 import { getDefaultEventEnd } from '@fullcalendar/core/internal';
+import { withErrorHandling } from '@/utils/errorHandler';
 
 
 interface timeData {
@@ -89,16 +90,43 @@ export async function getShiftAve(
     return results;
 }
 
-export async function getShiftReq(
+/* 複数人のユーザーのシフト情報を一度に取り出し */
+export const getMultiShiftAve = withErrorHandling(async (
+    userIds: string[], 
+    getStart: string, 
+    getEnd: string
+) => {
+    console.log("function getShiftAve");
+    console.log("userId:", userIds);
+    console.log("getStart:", getStart);
+    console.log("getEnd:", getEnd);
+
+    // stringに変換してデータベースに渡す
+    const str_getStart = getStart;
+    const str_getEnd = getEnd;
+    const { data: results, error } = await supabase
+        .from('Shift_Ava')
+        .select('*')
+        .in('userId', userIds)
+        .gte('start', str_getStart)
+        .lte('end', str_getEnd);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return results;
+});
+
+/* 店側の要求シフト */
+export const getShiftReq = withErrorHandling(async (
     getStart: string, //開始区間
-    getEnd: string, //終わり区間
-) {
+    getEnd: string //終わり区間
+) => {
     console.log("function getShiftReq");
     console.log("getStart:", getStart);
     console.log("getEnd:", getEnd);
-    
 
-    //stringに変換してデータベースに渡す
     const str_getStart = getStart;
     const str_getEnd = getEnd;
     const { data: results, error } = await supabase
@@ -110,6 +138,6 @@ export async function getShiftReq(
     if (error) {
         throw new Error(error.message);
     }
-    //結果を返す
+    
     return results;
-}
+});

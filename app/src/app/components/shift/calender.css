@@ -158,6 +158,7 @@
     /* ミントティール */
     color: #FFFFFF;
     border-radius: 5px !important;
+    overflow-wrap: normal;
     /* overflow: hidden; */
     padding: 2px;
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2) !important;
@@ -185,12 +186,12 @@
     scale: 0.98;
 }
 
-.aveShift {
+.avaShift {
     background-color: #6495ED;
     /* スカイブルー */
     color: #FFFFFF;
     border-radius: 5px !important;
-    /* overflow: hidden; */
+    overflow-wrap: normal;
     padding: 2px;
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2) !important;
     transition: box-shadow 0.3s ease;
@@ -198,7 +199,7 @@
     position: relative;
 }
 
-.aveShift:hover {
+.avaShift:hover {
     background-color: #6495ED;
     /* スカイブルー */
     color: #FFFFFF;
@@ -207,12 +208,16 @@
     scale: 1.01;
 }
 
-.aveShift:focus,
-.aveShift:active {
+.avaShift:focus,
+.avaShift:active {
     background-color: #6495ED;
     /* スカイブルー */
     color: #FFFFFF;
     box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
     opacity: 0.8;
     scale: 0.98;
+}
+
+.avaShift:hover .buttonContainer{
+    display: f
 }

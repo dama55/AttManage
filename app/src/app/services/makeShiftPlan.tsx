@@ -14,7 +14,14 @@ interface reqShiftData {
 
 interface AssignedShift {
     userId: string;
-    shifts: reqShiftData[];
+    shifts: userShiftData[];
+}
+
+interface noShiftData {
+    id: number;
+    remain_num: number;
+    start: string;
+    end: string;
 }
 
 // ユーザー候補を取得するヘルパー関数
@@ -23,6 +30,7 @@ function getAvailableUsersForShift(
     shift: reqShiftData,
     shiftSum: { [key: string]: number }
 ): string | null {
+    //勤務可能なユーザーのキーが入る
     const candidates = Object.keys(userShiftMap).filter((userId) => {
         const userShifts = userShiftMap[userId];
         const isAvailable = !userShifts.some(
@@ -33,6 +41,7 @@ function getAvailableUsersForShift(
 
     if (candidates.length === 0) return null;
 
+    // 現状の勤務予定シフト数が最も少ないユーザーを返す．
     return candidates.reduce((minUser, userId) =>
         shiftSum[userId] < shiftSum[minUser] ? userId : minUser
     );
@@ -43,13 +52,20 @@ function assignShiftToUser(
     userId: string,
     shift: reqShiftData,
     shiftSum: { [key: string]: number },
-    groupedReqShifts: reqShiftData[][],
-    tempShift: reqShiftData[]
+    userShiftMap: { [key: string]: userShiftData[] },
+    tempShift: userShiftData[]
 ) {
-    tempShift.push(shift);
-    shiftSum[userId] += 1; // シフト時間の集計
-    shift.req_num -= 1; // req_numを一つ減らす
+    // userShiftMap からユーザーのシフトデータを取り出して追加
+    const userShifts = userShiftMap[userId];
+    const assignedShift = userShifts.find((userShift) => userShift.start === shift.start && userShift.end === shift.end);
+
+    if (assignedShift) {
+        tempShift.push(assignedShift); // userShiftData の情報を登録
+        shiftSum[userId] += 1; // シフト時間の集計
+        shift.req_num -= 1; // req_numを一つ減らす
+    }
 }
+
 
 // groupedReqShiftsの各グループを処理するメイン関数
 function processShiftGroup(
@@ -72,11 +88,11 @@ function processShiftGroup(
                 index++;
                 continue;
             }
-
+            // シフトに入れるuserを計算
             const userId = getAvailableUsersForShift(userShiftMap, shift, shiftSum);
             if (userId) {
-                let tempShift: reqShiftData[] = [];
-                assignShiftToUser(userId, shift, shiftSum, groupedReqShifts, tempShift);
+                let tempShift: userShiftData[] = [];
+                assignShiftToUser(userId, shift, shiftSum, userShiftMap, tempShift);
                 let prevShift = shift;
                 let tempIndex = index + 1;
 
@@ -90,7 +106,7 @@ function processShiftGroup(
                         break;
                     }
 
-                    assignShiftToUser(userId, nextShift, shiftSum, groupedReqShifts, tempShift);
+                    assignShiftToUser(userId, nextShift, shiftSum, userShiftMap, tempShift);
                     prevShift = nextShift;
                     tempIndex++;
 
@@ -101,6 +117,7 @@ function processShiftGroup(
                 resultShift.push({ userId, shifts: tempShift });
                 index = tempIndex; // インデックスを進める
             } else {
+                //誰も入れないなら，そのシフトを記録して飛ばす．
                 noShift.push(shift);
                 shift.req_num -= 1; // 該当するシフトのreq_numを減らす
                 index++;
@@ -126,22 +143,26 @@ function processShiftGroup(
 }
 
 export function makeShiftPlan(reqShifts: reqShiftData[], userShifts: userShiftData[]) {
+    const reqShiftsCopy: reqShiftData[] = JSON.parse(JSON.stringify(reqShifts));
+    const userShiftsCopy: userShiftData[] = JSON.parse(JSON.stringify(userShifts));
     const userShiftMap: { [key: string]: userShiftData[] } = {};
-    userShifts.forEach((shift) => {
+    // ユーザーごとにシフトを分割
+    userShiftsCopy.forEach((shift) => {
         if (!userShiftMap[shift.userId]) {
             userShiftMap[shift.userId] = [];
         }
         userShiftMap[shift.userId].push(shift);
     });
 
+    // シフト要求を連続したシフトのグループに分割
     const groupedReqShifts: reqShiftData[][] = [];
     let currentGroup: reqShiftData[] = [];
 
-    reqShifts.forEach((shift, index) => {
+    reqShiftsCopy.forEach((shift, index) => {
         if (index === 0) {
             currentGroup.push(shift);
         } else {
-            const prevShift = reqShifts[index - 1];
+            const prevShift = reqShiftsCopy[index - 1];
             const prevEnd = new Date(prevShift.end);
             const currentStart = new Date(shift.start);
 
@@ -153,18 +174,19 @@ export function makeShiftPlan(reqShifts: reqShiftData[], userShifts: userShiftDa
             }
         }
     });
-
+    // 最後のグループを追加
     if (currentGroup.length > 0) {
         groupedReqShifts.push(currentGroup);
     }
-
+    // 従業員のキーを取り出し
     const employeeKeys = Object.keys(userShiftMap);
+    // 要求シフトの総数をカウントするための配列
     const shiftSum: { [key: string]: number } = {};
     employeeKeys.forEach((userId) => {
         shiftSum[userId] = 0;
     });
-
-    const maxShiftDuration = 4; // 最大シフト数の設定（例として4）
+    // シフトの計算
+    const maxShiftDuration = 4; // 最大連続シフト数の設定（例として4）
     const { resultShift, noShift } = processShiftGroup(
         groupedReqShifts,
         userShiftMap,
@@ -172,5 +194,29 @@ export function makeShiftPlan(reqShifts: reqShiftData[], userShifts: userShiftDa
         maxShiftDuration
     );
 
-    return resultShift;
+    // 全てのシフトをまとめ、時間順にソートして返す
+    const sortedShifts = resultShift
+        .flatMap((entry) => entry.shifts)
+        .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+
+    // noShiftデータを集計して重複を除く
+    const aggregatedNoShift: noShiftData[] = [];
+    noShift.forEach((shift) => {
+        const existing = aggregatedNoShift.find(
+            (item) => item.start === shift.start && item.end === shift.end
+        );
+
+        if (existing) {
+            existing.remain_num += 1; // 既存の時間帯がある場合、remain_numをインクリメント
+        } else {
+            aggregatedNoShift.push({
+                id: shift.id,
+                remain_num: 1, // 初めて追加する場合は1から始める
+                start: shift.start,
+                end: shift.end,
+            });
+        }
+    });
+
+    return { sortedShifts, noShift };
 }

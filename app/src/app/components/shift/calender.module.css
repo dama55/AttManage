@@ -48,23 +48,29 @@
 /* イベントボタンデザイン */
 .buttonContainer {
     position: absolute;
-    left: calc(100% - 10px);
-    top: 0;
+    left: 0;
+    bottom: calc(100% - 5px);
     display: none;
-    flex-direction: column;
-    padding: 0 10px;
+    padding: 10px 0px;
     gap: 1px;
+    background-color: red;
+    z-index: 20000 !important;
 }
 
 .event_block{
     width: 100%;
     height: 100%;
+    position: relative;
 }
 
-.event_block:hover .buttonContainer,
-.buttonContainer:hover .buttonContainer {
+.event_block:hover .buttonContainer{
     display: flex;
 }
+
+.buttonContainer:hover{
+    display: flex;
+}
+
 
 .button {
     width: var(--font-size-xlarge);
@@ -78,7 +84,6 @@
     justify-content: center;
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s;
-    z-index: 20000;
 }
 
 .button:hover {

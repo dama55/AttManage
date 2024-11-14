@@ -27,7 +27,7 @@ const CalendarComponent = ({
       end: info.end,
       allDay: false,
       color: '#6495ED', // スカイブルー
-      className: 'aveShift',
+      className: 'avaShift',
     };
   },
   handleDateClickActions = (clickedDate) => { },

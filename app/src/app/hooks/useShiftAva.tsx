@@ -1,4 +1,4 @@
-// hooks/useShiftAve.ts
+// hooks/useShiftAva.ts
 'use client';
 import { supabase } from '@/lib/supabaseClient';
 import { useAsyncWithErrorHandling } from '@/hooks/useAsyncWithErrorHandling'
@@ -19,13 +19,13 @@ export interface ShiftData {
 }
 
 
-export function useShiftAve() {
+export function useShiftAva() {
     const { result, error, loading, executeAsyncFunction } = useAsyncWithErrorHandling<ShiftResponse>();
 
     // サインアップ関数
-    const getShiftAve = (userId: string, getStart: Date, getEnd: Date) =>
+    const getShiftAva = (userId: string, getStart: Date, getEnd: Date) =>
         executeAsyncFunction(async () => {
-            const response = await fetch('/api/shift_ave/get', {
+            const response = await fetch('/api/shift_ava/get', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, getStart, getEnd }),
@@ -34,16 +34,16 @@ export function useShiftAve() {
             const responseJson: ShiftResponse = await response.json();
 
             if (!response.ok) {
-                throw new Error(responseJson.error || 'getShiftAve failed');
+                throw new Error(responseJson.error || 'getShiftAva failed');
             }
             console.log("Successfully returend result");
             console.log("responseJson: ", responseJson);
             return responseJson;
         });
 
-    const editShiftAve = (deleteStart: string, deleteEnd: string, preData: ShiftData[], newData: ShiftData[]) =>
+    const editShiftAva = (deleteStart: string, deleteEnd: string, preData: ShiftData[], newData: ShiftData[]) =>
         executeAsyncFunction(async () => {
-            const response = await fetch('/api/shift_ave/edit', {
+            const response = await fetch('/api/shift_ava/edit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json'},
                 body: JSON.stringify({deleteStart, deleteEnd, preData, newData})
@@ -52,12 +52,12 @@ export function useShiftAve() {
             const responseJson: ShiftResponse = await response.json();
 
             if (!response.ok){
-                throw new Error(responseJson.error || 'editShiftAve failed');
+                throw new Error(responseJson.error || 'editShiftAva failed');
             }
             return responseJson;
         });
 
 
 
-    return { result, error, loading, getShiftAve, editShiftAve };
+    return { result, error, loading, getShiftAva, editShiftAva };
 }
