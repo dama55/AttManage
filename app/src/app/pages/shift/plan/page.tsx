@@ -12,6 +12,7 @@ import { withAuth } from '@/hooks/auth/withAuth';
 import { GiFullMetalBucketHandle } from 'react-icons/gi';
 import { Session } from '@supabase/supabase-js';
 import { DateSelectArg } from '@fullcalendar/core';
+import ControlButton from '@/components/ControlButton';
 
 function ReqShiftPage() {
     const { sidePeakContent, setSidePeakContent, setPopUpContent, setSidePeakFlag } = useRootLayout();
@@ -152,11 +153,14 @@ function ReqShiftPage() {
         fetchData();
     }, [editableMonth, isEditable]);
 
-
+    const handleClick = () => {
+        //処理は後で追加
+    };
 
     return (
         <>
-            <div>シフト要望</div>
+            <div>シフト計算</div>
+            <ControlButton onClick={handleClick}>シフトを割り当て</ControlButton>
             {isEditable ? (<div className={styles.edit_title}><h1>編集モード<FaEdit className={styles.title_icon} /></h1></div>) : (<div className={styles.edit_title}><h1>閲覧モード<GrView className={styles.title_icon} /></h1></div>)}
             {!isEditable ? <CustomButton onClick={editHandler}><span className={styles.button_text}>編集</span></CustomButton> : null}
             {isEditable ?
