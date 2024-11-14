@@ -9,6 +9,8 @@ import styles from '@/components/shift/calender.module.css'
 import '@/components/shift/calender.css';
 import { useSessionContext } from '@/contexts/SessionContext';
 
+import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
+
 const CalendarComponent = ({
   events,
   setEvents,
@@ -17,7 +19,18 @@ const CalendarComponent = ({
   setEditableMonth,
   initialView = 'dayGridMonth', //日付ビューを初期値に
   initialDate = new Date().toISOString(),
-  handleDateClickActions = (clickedDate) => {},
+  initShiftData = (info, session) => {
+    return {
+      id: Math.floor(Math.random() * 9000000) + 1000000, //一時IDを付加する 
+      userId: session.user.id,
+      start: info.start,
+      end: info.end,
+      allDay: false,
+      color: '#6495ED', // スカイブルー
+      className: 'aveShift',
+    };
+  },
+  handleDateClickActions = (clickedDate) => { },
   headerToolbar = {
     left: 'prev,today,next',
     center: 'title',
@@ -45,13 +58,7 @@ const CalendarComponent = ({
     if (viewType == 'dayGridMonth') {
 
     } else {
-      const newEvent = {
-        id: Math.floor(Math.random() * 9000000) + 1000000, //一時IDを付加する 
-        userId: session.user.id,
-        start: info.start,
-        end: info.end,
-        allDay: false,
-      };
+      const newEvent = initShiftData(info, session);
 
       // 既存のイベントと重複していないか確認
       if (isTimeConflict(newEvent, events)) {
@@ -237,6 +244,52 @@ const CalendarComponent = ({
     return {};// 編集状態じゃないときは制限しない
   };
 
+  /* イベントの削除 */
+  const handleDelete = (info) => {
+    const deleted_events = events.filter(event => event.id !== info.event.id);
+    setEvents(events.filter(event => event.id !== Number(info.event.id)));
+  };
+
+  const handleAdd = (info) => {
+    const updatedEvents = events.map((ev) => {
+      if (ev.id === Number(info.event.id) &&
+        info.event.classNames.includes('reqShift') &&
+        ev.req_num < 5) {
+        return {
+          ...ev,
+          req_num: ev.req_num + 1,
+          extendedProps: {
+            ...ev.extendedProps,
+            req_num: ev.req_num + 1  // カスタムデータを追加
+          }
+        }
+      } else {
+        return { ...ev };
+      }
+    });
+    setEvents(updatedEvents);
+  }
+
+  const handleRemove = (info) => {
+    const updatedEvents = events.map((ev) => {
+      if (ev.id === Number(info.event.id) &&
+        info.event.classNames.includes('reqShift') &&
+        ev.req_num > 1) {
+        return {
+          ...ev,
+          req_num: ev.req_num - 1,
+          extendedProps: {
+            ...ev.extendedProps,
+            req_num: ev.req_num - 1  // カスタムデータを追加
+          }
+        };
+      } else {
+        return { ...ev };
+      }
+    });
+    setEvents(updatedEvents);
+  }
+
 
   return (
     <>
@@ -263,11 +316,58 @@ const CalendarComponent = ({
           dateClick={handleDateClick} //クリックした月が編集可能かを判定
           datesSet={handleDatesSet} //クリックした月を記録
           validRange={computeValidRange()} //表示可能領域を設定
-          eventContent={(arg) => (
-            <div className={styles.event_block}>
-              <div>{arg.timeText}</div> {/* 開始時間と終了時間 */}
-            </div>
-          )}
+          eventContent={(arg) => {
+            // 月間ビューでは、時間を表示する
+            // if (arg.view.type === 'dayGridMonth') {
+            const startTime = arg.event.start ? arg.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+            const endTime = arg.event.end ? arg.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+            if (arg.event.classNames.includes('reqShift')) {  // クラス名で判定
+              return (
+                <div className={styles.event_block}>
+                  <div className={styles.event_head}>
+                    <div>{startTime} - {endTime}</div> {/* 時間範囲の表示 */}
+                    {/* <div>要求シフト</div> */}
+                    <div className={styles.event_count}>/{arg.event.extendedProps.req_num}</div> {/* extendedPropsから取得 */}
+                  </div>
+                  {/* インタラクション用のボタン */}
+                  {isEditable && (
+                    <div className={styles.buttonContainer}>
+                      <div className={styles.button} onClick={() => handleDelete(arg)}>
+                        <FaTrash />
+                      </div>
+                      <div className={styles.button} onClick={() => handleAdd(arg)} title="増加">
+                        <FaPlus />
+                      </div>
+                      <div className={styles.button} onClick={() => handleRemove(arg)} title="減少">
+                        <FaMinus />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+              );
+            } else {
+              return (
+                <div className={styles.event_block}>
+                  <div>{startTime} - {endTime}</div> {/* 時間範囲の表示 */}
+                  {isEditable && (
+                    <div className={styles.buttonContainer}>
+                      <div className={styles.button} onClick={() => handleDelete(arg)}>
+                        <FaTrash />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+            // }
+            // 他のビューではデフォルト表示
+            // return (
+            //   <div className={styles.event_block}>
+            //     <div>{arg.timeText}</div>
+            //   </div>
+            // );
+          }}
           buttonText={{
             today: '今日',
             month: '月',

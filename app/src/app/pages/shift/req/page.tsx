@@ -4,20 +4,21 @@ import { useRootLayout, RootLayoutProvider } from '@/contexts/RootLayoutContext'
 import CalendarComponent from '@/components/shift/calender';
 import CustomButton from '@/components/CustomButton';
 import styles from '@/pages/shift/ave/edit/edit.module.css'
-import { useShiftAve } from '@/hooks/useShiftAve';
+import { useShiftReq, ShiftReqData } from '@/hooks/useShiftReq';
 import { FaEdit } from "react-icons/fa";
 import { GrView } from "react-icons/gr";
 import { useSessionContext } from '@/contexts/SessionContext';
 import { withAuth } from '@/hooks/auth/withAuth';
 import { GiFullMetalBucketHandle } from 'react-icons/gi';
-import { ShiftData } from '@/hooks/useShiftAve';
+import { Session } from '@supabase/supabase-js';
+import { DateSelectArg } from '@fullcalendar/core';
 
 function ReqShiftPage() {
     const { sidePeakContent, setSidePeakContent, setPopUpContent, setSidePeakFlag } = useRootLayout();
-    const [pre_events, setPreEvents] = useState<ShiftData[]>([]);
-    const [events, setEvents] = useState<ShiftData[]>([]);
+    const [pre_events, setPreEvents] = useState<ShiftReqData[]>([]);
+    const [events, setEvents] = useState<ShiftReqData[]>([]);
     const [isEditable, setIsEditable] = useState(false);
-    const { result, error, loading, getShiftAve, editShiftAve } = useShiftAve();
+    const { result, error, loading, getShiftReq, editShiftReq } = useShiftReq();
     const [editableMonth, setEditableMonth] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
     const { session } = useSessionContext();
 
@@ -39,7 +40,7 @@ function ReqShiftPage() {
         const { month, year } = editableMonth;
         const deleteStart = new Date(year, month - 1, 1); // 月の初日
         const deleteEnd = new Date(year, month, 0); // 月の最終日
-        editShiftAve(deleteStart.toISOString(), deleteEnd.toISOString(), pre_events, events);
+        editShiftReq(deleteStart.toISOString(), deleteEnd.toISOString(), pre_events, events);
     };
 
     const baseProps = {
@@ -48,6 +49,22 @@ function ReqShiftPage() {
         isEditable: isEditable,
         editableMonth: editableMonth,
         setEditableMonth: setEditableMonth,
+        initShiftData: (info: DateSelectArg, session: Session | null | undefined) => {
+            //シフトデータの初期値
+            return {
+                id: Math.floor(Math.random() * 9000000) + 1000000, //一時IDを付加する 
+                userId: "",
+                req_num: 1,
+                start: info.start,
+                end: info.end,
+                allDay: false,
+                color: '#66CDAA', // ミントティール
+                className: 'reqShift',
+                extendedProps: {
+                    req_num: 1  // カスタムデータを追加
+                }
+            }
+        },
     }
 
     const sideProps = {
@@ -109,17 +126,26 @@ function ReqShiftPage() {
 
         const fetchData = async () => {
             if (session && session.user) {
-                console.log("session.user.id: ", session.user.id);
                 console.log("getStart: ", getStart);
                 console.log("getEnd: ", getEnd);
 
                 // 非同期処理を実行して結果を取得
-                const response = await getShiftAve(session.user.id, getStart, getEnd);
+                const response = await getShiftReq(getStart, getEnd);
                 console.log("response: ", response);
                 if (response !== null) {
                     console.log("response.result: ", response.data);
-                    setEvents(response.data);
-                    setPreEvents(response.data);
+
+                    //各シフトに色とクラス名を指定
+                    const updatedEvents = response.data.map(event => ({
+                        ...event,
+                        color: '#66CDAA', // ミントティール
+                        className: 'reqShift',
+                        extendedProps: {
+                            req_num: event.req_num  // カスタムデータを追加
+                        }
+                    }));
+                    setEvents(updatedEvents);
+                    setPreEvents(updatedEvents);
                 }
             }
         };

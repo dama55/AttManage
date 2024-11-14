@@ -1,5 +1,3 @@
-
-
 /* カレンダー全体の背景色 */
 .calendarBackground {
     width: 100%;
@@ -17,26 +15,73 @@
 }
 
 /* 曜日などサブのフォント */
-.calender_subtle_font{
+.calender_subtle_font {
     font-size: var(--font-size-small);
     font-weight: normal;
     color: rgba(55, 53, 47, 0.5);
 }
 
 /* 日付表示における日付などメインのフォント */
-.calender_main_num_font{
+.calender_main_num_font {
     font-size: var(--font-size-xlarge);
     font-weight: normal;
 }
 
-.calender_day_box{
+.calender_day_box {
     /* padding-top: 8px; */
     margin-top: 8px;
 }
 
 /* イベントデザイン */
 
+.event_head {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.event_count {
+    padding-left: 10px;
+}
+
+/* イベントボタンデザイン */
+.buttonContainer {
+    position: absolute;
+    left: calc(100% - 10px);
+    top: 0;
+    display: none;
+    flex-direction: column;
+    padding: 0 10px;
+    gap: 1px;
+}
 
 .event_block{
+    width: 100%;
+    height: 100%;
+}
 
+.event_block:hover .buttonContainer,
+.buttonContainer:hover .buttonContainer {
+    display: flex;
+}
+
+.button {
+    width: var(--font-size-xlarge);
+    height: var(--font-size-xlarge);
+    background-color: #ffffff;
+    color: black;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    z-index: 20000;
+}
+
+.button:hover {
+    background-color: #f0f0f0;
+    color: #000000;
 }
