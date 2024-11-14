@@ -3,21 +3,21 @@ import React, { useState, useEffect } from 'react';
 import { useRootLayout, RootLayoutProvider } from '@/contexts/RootLayoutContext';
 import CalendarComponent from '@/components/shift/calender';
 import CustomButton from '@/components/CustomButton';
-import styles from '@/pages/shift/ave/edit/edit.module.css'
-import { useShiftAve } from '@/hooks/useShiftAve';
+import styles from '@/pages/shift/ava/edit/edit.module.css'
+import { useShiftAva } from '@/hooks/useShiftAva';
 import { FaEdit } from "react-icons/fa";
 import { GrView } from "react-icons/gr";
 import { useSessionContext } from '@/contexts/SessionContext';
 import { withAuth } from '@/hooks/auth/withAuth';
 import { GiFullMetalBucketHandle } from 'react-icons/gi';
-import { ShiftData } from '@/hooks/useShiftAve';
+import { ShiftData } from '@/hooks/useShiftAva';
 
-function AveShiftPage() {
+function AvaShiftPage() {
   const { sidePeakContent, setSidePeakContent, setPopUpContent, setSidePeakFlag } = useRootLayout();
   const [pre_events, setPreEvents] = useState<ShiftData[]>([]);
   const [events, setEvents] = useState<ShiftData[]>([]);
   const [isEditable, setIsEditable] = useState(false);
-  const { result, error, loading, getShiftAve, editShiftAve } = useShiftAve();
+  const { result, error, loading, getShiftAva, editShiftAva } = useShiftAva();
   const [editableMonth, setEditableMonth] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
   const { session } = useSessionContext();
 
@@ -36,7 +36,7 @@ function AveShiftPage() {
     const { month, year } = editableMonth;
     const deleteStart = new Date(year, month - 1, 1); // 月の初日
     const deleteEnd = new Date(year, month, 0); // 月の最終日
-    editShiftAve(deleteStart.toISOString(), deleteEnd.toISOString(), pre_events, events);
+    editShiftAva(deleteStart.toISOString(), deleteEnd.toISOString(), pre_events, events);
   };
 
   const baseProps = {
@@ -111,7 +111,7 @@ function AveShiftPage() {
         console.log("getEnd: ", getEnd);
 
         // 非同期処理を実行して結果を取得
-        const response = await getShiftAve(session.user.id, getStart, getEnd);
+        const response = await getShiftAva(session.user.id, getStart, getEnd);
         console.log("response: ", response);
         if (response !== null) {
           console.log("response.result: ", response.data);
@@ -120,7 +120,7 @@ function AveShiftPage() {
           const updatedEvents = response.data.map(event => ({
             ...event,
             color: '#6495ED', // ミントティール
-            className: 'aveShift'
+            className: 'avaShift'
           }));
           setEvents(updatedEvents);
           setPreEvents(updatedEvents);
@@ -150,5 +150,4 @@ function AveShiftPage() {
   );
 }
 
-export default withAuth(AveShiftPage);
-// export default AveShiftPage;
+export default withAuth(AvaShiftPage);
