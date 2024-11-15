@@ -1,0 +1,48 @@
+.breadcrumbs {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    height: 100%;
+    width: 100%;
+    padding-left: 80px;
+}
+
+.breadcrumbs ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* 各パンくず要素のスタイル */
+.item{
+    display: inline-block;
+    border-radius: 10px;
+    padding: 5px;
+    transition: background-color 0.5s ease;
+}
+
+.item:hover{
+    background-color: rgba(200, 200, 200, 0.5);
+    
+}
+
+
+.link {
+    text-decoration: none;
+    color: black;
+    font-size: 16px;
+    transition: color 0.1s ease, transform 0.1s ease;
+}
+
+
+.separator {
+    margin: 0 8px;
+    color: #ccc;
+}
+
+.current {
+    color: #555;
+    font-size: 16px;
+}
