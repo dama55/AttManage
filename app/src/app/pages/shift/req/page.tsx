@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRootLayout, RootLayoutProvider } from '@/contexts/RootLayoutContext';
 import CalendarComponent from '@/components/shift/calender';
 import CustomButton from '@/components/CustomButton';
-import styles from '@/pages/shift/ava/edit/edit.module.css'
+import styles from '@/pages/shift/ava/edit.module.css'
 import { useShiftReq, ShiftReqData } from '@/hooks/useShiftReq';
 import { FaEdit } from "react-icons/fa";
 import { GrView } from "react-icons/gr";

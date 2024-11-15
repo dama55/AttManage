@@ -54,7 +54,7 @@
     padding: 10px 0px;
     gap: 1px;
     /* background-color: red; */
-    z-index: 20000 !important;
+    z-index: 100 !important;
 }
 
 .event_block {

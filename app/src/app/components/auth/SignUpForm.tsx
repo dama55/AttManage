@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { emitKeypressEvents } from 'readline';
+import styles from '@/components/auth/SignInForm.module.css';
+import Link from 'next/link';
 
 function SignUpForm() {
   const {message, signUp} = useAuth();
@@ -18,13 +20,16 @@ function SignUpForm() {
   };
 
   return (
-    <form onSubmit={handleSignUp}>
-      <input type="text" name="displayName" placeholder="Display Name" required /> {/* 表示名の入力フィールド */}
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Sign Up</button>
+    <>
+    <form className={styles.container} onSubmit={handleSignUp}>
+      <input className={styles.Signinput} type="text" name="displayName" placeholder="Display Name" required /> {/* 表示名の入力フィールド */}
+      <input className={styles.Signinput} type="email" name="email" placeholder="Email" required />
+      <input className={styles.Signinput} type="password" name="password" placeholder="Password" required />
+      <button className={styles.custom_button} type="submit">Sign Up</button>
       {message && <p style={{ color: 'red' }}>{message}</p>}
+      <Link href='/pages/signin'>サインインページ</Link>
     </form>
+    </>
   );
 }
 

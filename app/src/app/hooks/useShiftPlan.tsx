@@ -24,7 +24,7 @@ export function useShiftPlan() {
             const response = await fetch('/api/shift_plan/calc', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ getStart, getEnd, roles: ["Owner"] }),
+                body: JSON.stringify({ getStart, getEnd, roles: ["Owner", "Employee"] }),
             });
             console.log("Response: ", response);
             const responseJson: ShiftResponse = await response.json();
