@@ -13,9 +13,9 @@ const SessionContext = createContext<SessionContextType | null>(null);
 
 //セッションコンテキストの型定義
 interface SessionContextType {
-    session: Session | null;
-    handleSignIn: ()=> Promise<void>;
-    handleSignOut: ()=> Promise<void>;
+    session: Session | null | undefined;
+    handleSignIn: () => Promise<void>;
+    handleSignOut: () => Promise<void>;
 }
 
 interface SessionContextProviderProps {
@@ -28,7 +28,8 @@ interface SessionContextProviderProps {
 
 export function SessionContextProvider({ children }: SessionContextProviderProps) {
     // セッション情報の取得
-    const [session, setSession] = useState<any>(null);
+    // sessionがnullならサインインしていない
+    const [session, setSession] = useState<Session | null | undefined>(undefined);
     const router = useRouter();
 
 
@@ -53,7 +54,7 @@ export function SessionContextProvider({ children }: SessionContextProviderProps
             authListener.subscription.unsubscribe();
         };
     }, []);
-    
+
     //サインインページに飛ばす処理
     const handleSignIn = async () => {
         router.push("/pages/signin");
@@ -62,10 +63,11 @@ export function SessionContextProvider({ children }: SessionContextProviderProps
     //サインアウトをする処理
     const handleSignOut = async () => {
         await supabase.auth.signOut();
+        setSession(null); //ログインして以内ならnull
         router.push("/pages/signin");
     };
 
-    
+
     return (
         <SessionContext.Provider value={{ session, handleSignIn, handleSignOut }}>
             {children}

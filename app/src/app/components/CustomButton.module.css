@@ -1,0 +1,32 @@
+.custom_button {
+    color: black !important;
+    /* 文字色 */
+    background: none !important;
+    /* 背景色を透明に */
+    border: none !important;
+    /* 最初はボーダーなし */
+    padding: 0px 0px;
+    margin: 0 2px !important;
+    transition: border-color 0.2s ease, color 0.2s ease;
+    border-radius: 4px !important;
+    /* 角を丸く */
+    cursor: pointer;
+}
+
+/* ホバー時の背景色 */
+.custom_button:hover {
+    background-color: rgba(200, 200, 200, 0.5) !important;
+}
+
+/* クリック時の背景色 */
+.custom_button:active {
+    background-color: rgba(150, 150, 150, 0.8) !important;
+}
+
+/* 子アイコンやテキストの色設定 */
+.custom_button svg,
+.custom_button span {
+    width: var(--font-size-large);
+    height: var(--font-size-large);
+    color: rgba(55, 53, 47, 0.5) !important;
+}

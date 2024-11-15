@@ -1,6 +1,6 @@
 // components/server/Employees.ts
 //従業員情報を取り出すサーバーサイドコンポーネント
-import { getAllUsers } from '@/services/userService';
+import { getAllUsers } from '@/modules/userModules';
 import React from 'react';
 
 interface User {

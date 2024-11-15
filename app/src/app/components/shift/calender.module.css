@@ -1,0 +1,104 @@
+/* カレンダー全体の背景色 */
+.calendarBackground {
+    width: 100%;
+    background-color: rgb(241, 241, 239);
+    /* 任意の背景色 */
+    border-radius: 12px;
+    /* お好みの角丸サイズ */
+    overflow: hidden;
+    /* 角丸部分に合わせて内容を隠す */
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+    /* カレンダーに影をつける場合 */
+    border: 1px solid rgb(233, 233, 231);
+    /* 必要に応じて枠線を設定 */
+    padding: 20px 0px;
+}
+
+/* 曜日などサブのフォント */
+.calender_subtle_font {
+    font-size: var(--font-size-small);
+    font-weight: normal;
+    color: rgba(55, 53, 47, 0.5);
+}
+
+/* 日付表示における日付などメインのフォント */
+.calender_main_num_font {
+    font-size: var(--font-size-xlarge);
+    font-weight: normal;
+}
+
+.calender_day_box {
+    /* padding-top: 8px; */
+    margin-top: 8px;
+}
+
+/* イベントデザイン */
+
+.event_head {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.event_count {
+    padding-left: 10px;
+}
+
+/* イベントボタンデザイン */
+.buttonContainer {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% - 5px);
+    display: none;
+    padding: 10px 0px;
+    gap: 1px;
+    /* background-color: red; */
+    z-index: 20000 !important;
+}
+
+.event_block {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    /* background-color: blue; */
+}
+
+
+:global(.reqShift):hover .buttonContainer,
+:global(.avaShift):hover .buttonContainer{
+    display: flex;
+}
+
+
+
+.buttonContainer:hover {
+    display: flex;
+}
+
+
+.button {
+    width: var(--font-size-xlarge);
+    height: var(--font-size-xlarge);
+    background-color: #ffffff;
+    color: black;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.button:hover {
+    background-color: #f0f0f0;
+    color: #000000;
+}
+
+.userName{
+    border-radius: 10px;
+    background-color: rgba(35, 47, 62, 1);
+    padding: 1px 4px;
+    display: inline-block;
+}
