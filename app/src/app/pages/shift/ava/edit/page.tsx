@@ -10,14 +10,20 @@ import { GrView } from "react-icons/gr";
 import { useSessionContext } from '@/contexts/SessionContext';
 import { withAuth } from '@/hooks/auth/withAuth';
 import { GiFullMetalBucketHandle } from 'react-icons/gi';
-import { ShiftData } from '@/hooks/useShiftAva';
+import { TypeAvaShift, TypeAvaEvent, TypeEvent } from '@/types/shiftTypes';
+import { MakeEventfromAvaShift, SplitAndConvertEventsToShift, AddEditableToEvents, MakeEventfromReqShift, mergeContinuousEvents } from '@/utils/client/eventUtils';
+import { Session } from '@supabase/supabase-js';
+import { DateSelectArg } from '@fullcalendar/core';
+import { useShiftReq } from '@/hooks/useShiftReq';
 
 function AvaShiftPage() {
   const { sidePeakContent, setSidePeakContent, setPopUpContent, setSidePeakFlag } = useRootLayout();
-  const [pre_events, setPreEvents] = useState<ShiftData[]>([]);
-  const [events, setEvents] = useState<ShiftData[]>([]);
+  const [pre_events, setPreEvents] = useState<TypeEvent[]>([]);
+  const [events, setEvents] = useState<TypeEvent[]>([]);
   const [isEditable, setIsEditable] = useState(false);
   const { result, error, loading, getShiftAva, editShiftAva } = useShiftAva();
+  const { getShiftReq } = useShiftReq();
+
   const [editableMonth, setEditableMonth] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
   const { session } = useSessionContext();
 
@@ -36,15 +42,37 @@ function AvaShiftPage() {
     const { month, year } = editableMonth;
     const deleteStart = new Date(year, month - 1, 1); // 月の初日
     const deleteEnd = new Date(year, month, 0); // 月の最終日
-    editShiftAva(deleteStart.toISOString(), deleteEnd.toISOString(), pre_events, events);
+    // データを種類ごとに分けて処理
+    const { avaShifts: prev_avaShifts, } = SplitAndConvertEventsToShift(pre_events);
+    const { avaShifts } = SplitAndConvertEventsToShift(events);
+    editShiftAva(deleteStart.toISOString(), deleteEnd.toISOString(), prev_avaShifts, avaShifts);
   };
 
+  const initShiftData = (info: DateSelectArg, session: Session) => {
+    return {
+      id: Math.floor(Math.random() * 9000000) + 1000000, //一時IDを付加する 
+      start: info.start,
+      end: info.end,
+      allDay: false,
+      color: '#6495ED', // スカイブルー
+      className: 'avaShift commonShift',
+      extendedProps: {
+        event_type: '0', //シフト希望
+        userId: session.user.id, //ユーザーID
+        eventEditable: true, //編集可能
+      }
+    };
+  };
+
+  //カレンダーに渡すプロパティ
   const baseProps = {
-    events: events,
+    events: events, //イベントデータ
     setEvents: setEvents,
-    isEditable: isEditable,
-    editableMonth: editableMonth,
+    isEditable: isEditable, //編集可能かどうか
+    editableMonth: editableMonth, //編集可能な月
     setEditableMonth: setEditableMonth,
+    initShiftData, //追加するイベントの初期値
+
   }
 
   const sideProps = {
@@ -91,10 +119,12 @@ function AvaShiftPage() {
     let getEnd: Date;
 
     if (isEditable) {
+      //編集時のデータ取得範囲
       const { month, year } = editableMonth;
       getStart = new Date(year, month - 1, 1); // 月の初日
       getEnd = new Date(year, month, 0);       // 月の最終日
     } else {
+      //閲覧時のデータ取得範囲
       const { month, year } = editableMonth;
       // 前後一週間のデータを取得するために日付を調整
       getStart = new Date(year, month - 1, 1);
@@ -111,19 +141,18 @@ function AvaShiftPage() {
         console.log("getEnd: ", getEnd);
 
         // 非同期処理を実行して結果を取得
-        const response = await getShiftAva(session.user.id, getStart, getEnd);
-        console.log("response: ", response);
-        if (response !== null) {
-          console.log("response.result: ", response.data);
+        const response_ava = await getShiftAva(session.user.id, getStart, getEnd);
+        if (response_ava !== null) {
 
-          //各シフトに色とクラス名を指定
-          const updatedEvents = response.data.map(event => ({
-            ...event,
-            color: '#6495ED', // ミントティール
-            className: 'avaShift'
-          }));
-          setEvents(updatedEvents);
-          setPreEvents(updatedEvents);
+          let updatedEvents_ava: TypeEvent[] = MakeEventfromAvaShift(response_ava.data);
+
+          // 編集可能に設定
+          updatedEvents_ava = AddEditableToEvents(updatedEvents_ava, true);
+
+          const mergedEvents = mergeContinuousEvents(updatedEvents_ava);
+
+          setEvents(mergedEvents);
+          setPreEvents(updatedEvents_ava);
         }
       }
     };

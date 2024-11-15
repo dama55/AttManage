@@ -10,6 +10,7 @@ import '@/components/shift/calender.css';
 import { useSessionContext } from '@/contexts/SessionContext';
 
 import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
+import { escape } from 'querystring';
 
 const CalendarComponent = ({
   events,
@@ -19,17 +20,7 @@ const CalendarComponent = ({
   setEditableMonth,
   initialView = 'dayGridMonth', //日付ビューを初期値に
   initialDate = new Date().toISOString(),
-  initShiftData = (info, session) => {
-    return {
-      id: Math.floor(Math.random() * 9000000) + 1000000, //一時IDを付加する 
-      userId: session.user.id,
-      start: info.start,
-      end: info.end,
-      allDay: false,
-      color: '#6495ED', // スカイブルー
-      className: 'avaShift',
-    };
-  },
+  initShiftData,
   handleDateClickActions = (clickedDate) => { },
   headerToolbar = {
     left: 'prev,today,next',
@@ -51,7 +42,7 @@ const CalendarComponent = ({
     return null; // calendarRef.current が null の場合、null を返す
   };
 
-
+  /* 新しいオブジェクト生成時にの処理 */
   const handleSelect = (info) => {
     const viewType = info.view.type;
 
@@ -71,27 +62,27 @@ const CalendarComponent = ({
     }
   };
 
-  /* 現状のカレンダーの状態が編集可能なのかどうかを判定 */
-  const editableCheck = () => {
-    if (!isEditable) {
-      console.log("isEditable: ", isEditable);
-      return false
-    }
+  // /* 現状のカレンダーの状態が編集可能なのかどうかを判定 */
+  // const editableCheck = () => {
+  //   if (!isEditable) {
+  //     console.log("isEditable: ", isEditable);
+  //     return false
+  //   }
 
-    const currentMonth = getCurrentMonth();
+  //   const currentMonth = getCurrentMonth();
 
-    if (currentMonth.month == null || currentMonth.year == null) {
-      //取得した月がnullの場合は編集できない
-      console.log("currentMonthがnullになっている")
-      return false;
-    }
+  //   if (currentMonth.month == null || currentMonth.year == null) {
+  //     //取得した月がnullの場合は編集できない
+  //     console.log("currentMonthがnullになっている")
+  //     return false;
+  //   }
 
-    if (currentMonth.month !== editableMonth.month || currentMonth.year !== editableMonth.year) {
-      return false;
-    }
+  //   if (currentMonth.month !== editableMonth.month || currentMonth.year !== editableMonth.year) {
+  //     return false;
+  //   }
 
-    return true;
-  }
+  //   return true;
+  // }
 
 
   // イベントのサイズ変更を処理
@@ -100,7 +91,7 @@ const CalendarComponent = ({
       return;
     }
     const { event } = resizeInfo;
-
+    //特定のイベントをリサイズ
     const updatedEvents = events.map((ev) => {
       if (ev.id === Number(event.id)) {
         return { ...ev, start: new Date(event.start), end: new Date(event.end) };
@@ -162,14 +153,18 @@ const CalendarComponent = ({
   /* 重複を確認する関数 */
   const isTimeConflict = (newEvent, existingEvents) => {
     return existingEvents.some((event) => {
-      return (
-        (newEvent.start < event.end && newEvent.end > event.start) || // 新しいイベントが既存のイベントに重なる
-        (newEvent.end > event.start && newEvent.start < event.end)
-      );
+      // イベントタイプが同じであることが必須の条件
+      console.log("New event: ", newEvent);
+      console.log("Compared event: ", event);
+      if (newEvent.extendedProps.event_type === event.extendedProps.event_type) {
+        return newEvent.start < event.end && newEvent.end > event.start;
+      } else {
+        return false;
+      }
     });
   };
 
-
+  /* 表示上で，選択状態にするかどうかの判定 */
   const selectAllowHandler = (Info) => {
     //編集状態じゃないなら選択できない
     if (!isEditable) {
@@ -188,16 +183,14 @@ const CalendarComponent = ({
     }
 
 
-
-    const newEvent = {
-      start: Info.start,
-      end: Info.end,
-    };
+    //仮のデータを作成
+    const newEvent = initShiftData(Info, session);
     // 重複がない場合のみ選択を許可
     return !isTimeConflict(newEvent, events);
   };
 
   // 日付クリックを特定の月以外では無効にする
+  //サイドピークなどで利用する予定
   const handleDateClick = (info) => {
     console.log("handleDateClick was called !!!");
     console.log("info.dateStr: ", info.dateStr);
@@ -219,7 +212,7 @@ const CalendarComponent = ({
     }
   };
 
-  // isEditableの値が更新される場合とページマウント時に，
+  // isEditableの値が更新される場合とページマウント時に，現在見ている月を更新
   useEffect(() => {
     if (!isEditable) { // isEditableがfalseのときのみ実行
       const currentMonth = getCurrentMonth();
@@ -230,7 +223,7 @@ const CalendarComponent = ({
   }, [isEditable]);
 
 
-  // 表示可能期間を表示
+  // 編集モードで表示可能期間を表示
   const computeValidRange = () => {
     if (isEditable && editableMonth) {
       const { year, month } = editableMonth;
@@ -250,17 +243,18 @@ const CalendarComponent = ({
     setEvents(events.filter(event => event.id !== Number(info.event.id)));
   };
 
+  /* シフト要求人数req_numを増加させる */
   const handleAdd = (info) => {
     const updatedEvents = events.map((ev) => {
       if (ev.id === Number(info.event.id) &&
         info.event.classNames.includes('reqShift') &&
-        ev.req_num < 5) {
+        ev.extendedProps.req_num < 5) {
         return {
           ...ev,
-          req_num: ev.req_num + 1,
+          req_num: ev.extendedProps.req_num + 1,
           extendedProps: {
             ...ev.extendedProps,
-            req_num: ev.req_num + 1  // カスタムデータを追加
+            req_num: ev.extendedProps.req_num + 1  // カスタムデータを追加
           }
         }
       } else {
@@ -270,17 +264,18 @@ const CalendarComponent = ({
     setEvents(updatedEvents);
   }
 
+  /* シフト要求人数req_numを減少させる */
   const handleRemove = (info) => {
     const updatedEvents = events.map((ev) => {
       if (ev.id === Number(info.event.id) &&
         info.event.classNames.includes('reqShift') &&
-        ev.req_num > 1) {
+        ev.extendedProps.req_num > 1) {
         return {
           ...ev,
-          req_num: ev.req_num - 1,
+          req_num: ev.extendedProps.req_num - 1,
           extendedProps: {
             ...ev.extendedProps,
-            req_num: ev.req_num - 1  // カスタムデータを追加
+            req_num: ev.extendedProps.req_num - 1  // カスタムデータを追加
           }
         };
       } else {
@@ -289,6 +284,84 @@ const CalendarComponent = ({
     });
     setEvents(updatedEvents);
   }
+
+  // イベントの内容を描画する関数
+  const renderEventContent = (arg) => {
+    const startTime = arg.event.start ? arg.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+    const endTime = arg.event.end ? arg.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+    const isReqShift = arg.event.classNames.includes('reqShift'); // reqShift クラスの確認
+    const isAssiShift = arg.event.classNames.includes('assiShift'); // reqShift クラスの確認
+    const isAssiShiftNoUer = arg.event.classNames.includes('assiShiftNoUser'); // reqShift クラスの確認
+    const isEventEditable = arg.event.extendedProps.eventEditable; // イベントの editable プロパティを確認
+
+    console.log("arg.event: ", arg.event);
+    console.log("arg.event.extendedProps.eventEditable: ", arg.event.extendedProps.eventEditable);
+
+
+    return (
+      <div className={styles.event_block}>
+        <div className={styles.event_head}>
+          <div>{startTime} - {endTime}</div>
+          {isReqShift && (
+            <div className={styles.event_count}>必要人数: {arg.event.extendedProps.req_num}</div>
+          )}
+          {isAssiShift && (
+            <div className={styles.event_count}>必要人数: {arg.event.extendedProps.userIds.length}/{arg.event.extendedProps.req_num}</div>
+          )}
+        </div>
+        {isAssiShiftNoUer && (
+          <div className={styles.event_count}>従業員が不足しています！</div>
+        )}
+        {arg.event.extendedProps.event_type === "3" && (
+          <div className={styles.nameContainer}>
+            {arg.event.extendedProps.userIds.map((id) => (
+              <span key={id} className={styles.userName}>
+                {arg.event.extendedProps.userNames[id]}
+              </span>
+            ))}
+          </div>
+        )}
+        {isEventEditable && isEditable && ( // editable が true の場合のみボタンを表示
+          <div className={styles.buttonContainer}>
+            <div className={styles.button} onClick={() => handleDelete(arg)}>
+              <FaTrash />
+            </div>
+            {isReqShift && (
+              <>
+                <div className={styles.button} onClick={() => handleAdd(arg)} title="増加">
+                  <FaPlus />
+                </div>
+                <div className={styles.button} onClick={() => handleRemove(arg)} title="減少">
+                  <FaMinus />
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+
+  // イベントの編集（ドラッグやリサイズ）を許可するかどうかをチェックする関数
+  const checkEventAllow = (dropInfo, draggedEvent) => {
+    console.log("checkEventAllow called");
+    console.log("dropInfo:", dropInfo);
+    console.log("draggedEvent:", draggedEvent);
+    console.log("draggedEvent.extendedProps:", draggedEvent.extendedProps);
+    console.log("draggedEvent.start:", draggedEvent.start);
+
+    // ドロップ先情報からイベントを取得
+    const event = draggedEvent;
+
+    return true;
+
+    //そもそも編集モードじゃないか，イベントが編集可能ではない
+    if (!isEditable || !event.extendedProps.eventEditable) {
+      return false;
+    }
+
+  };
 
 
   return (
@@ -302,72 +375,22 @@ const CalendarComponent = ({
           initialView={initialView}
           initialDate={initialDate}
           locale="ja"
-          events={events}
-          selectable={isEditable}
-          editable={isEditable} // ドラッグ＆ドロップを有効化
-          selectMirror={true}
-          select={handleSelect} // 範囲選択イベントハンドラ
-          selectAllow={selectAllowHandler} //セレクトそのものが許可されるかどうか
-          eventResizableFromStart={true} // イベントの開始時間もリサイズ可能に
-          eventResize={handleEventResize} // イベントのリサイズハンドラ
-          eventDrop={handleEventDrop}
-          eventOverlap={false}
-          slotEventOverlap={false}
-          dateClick={handleDateClick} //クリックした月が編集可能かを判定
-          datesSet={handleDatesSet} //クリックした月を記録
-          validRange={computeValidRange()} //表示可能領域を設定
-          eventContent={(arg) => {
-            // 月間ビューでは、時間を表示する
-            // if (arg.view.type === 'dayGridMonth') {
-            const startTime = arg.event.start ? arg.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-            const endTime = arg.event.end ? arg.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-            if (arg.event.classNames.includes('reqShift')) {  // クラス名で判定
-              return (
-                <div className={styles.event_block}>
-                  <div className={styles.event_head}>
-                    <div>{startTime} - {endTime}</div> {/* 時間範囲の表示 */}
-                    {/* <div>要求シフト</div> */}
-                    <div className={styles.event_count}>/{arg.event.extendedProps.req_num}</div> {/* extendedPropsから取得 */}
-                  </div>
-                  {/* インタラクション用のボタン */}
-                  {isEditable && (
-                    <div className={styles.buttonContainer}>
-                      <div className={styles.button} onClick={() => handleDelete(arg)}>
-                        <FaTrash />
-                      </div>
-                      <div className={styles.button} onClick={() => handleAdd(arg)} title="増加">
-                        <FaPlus />
-                      </div>
-                      <div className={styles.button} onClick={() => handleRemove(arg)} title="減少">
-                        <FaMinus />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-              );
-            } else {
-              return (
-                <div className={styles.event_block}>
-                  <div>{startTime} - {endTime}</div> {/* 時間範囲の表示 */}
-                  {isEditable && (
-                    <div className={styles.buttonContainer}>
-                      <div className={styles.button} onClick={() => handleDelete(arg)}>
-                        <FaTrash />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            }
-            // }
-            // 他のビューではデフォルト表示
-            // return (
-            //   <div className={styles.event_block}>
-            //     <div>{arg.timeText}</div>
-            //   </div>
-            // );
-          }}
+          events={events}//イベント
+          selectable={isEditable} //選択可能フラグ
+          editable={isEditable} //編集可能フラグ
+          selectMirror={isEditable}//ドラッグなどのリアルタイムレンダリング有効化
+          select={handleSelect}//セレクト状態のデータ段階でのハンドラ
+          selectAllow={selectAllowHandler}//セレクト状態の表示段階でのハンドラ
+          eventResizableFromStart={true}//イベント開始時間もリサイズ可能にする
+          eventResize={handleEventResize}//イベントリサイズハンドラ
+          eventDrop={handleEventDrop} //イベントドロップハンドラ
+          eventOverlap={false} //全体カレンダー表示でイベントの重なり表示を無効化
+          slotEventOverlap={false} //時間表示のあるビューでイベントの重なり表示を無効化
+          dateClick={handleDateClick} //クリック時ハンドラ
+          datesSet={handleDatesSet} //日付変更時ハンドラ
+          validRange={computeValidRange()} //表示可能範囲を指定
+          eventContent={renderEventContent} // イベントの内容を描画
+          eventAllow={checkEventAllow} //ドラッグアンドドロップ，リサイズを許可するか判定する関数
           buttonText={{
             today: '今日',
             month: '月',
@@ -378,13 +401,11 @@ const CalendarComponent = ({
           headerToolbar={headerToolbar}
           allDayText="担当者"
           dayCellContent={(arg) => {
-            //今日の日付を赤い丸で表示
             if (arg.view.type === 'dayGridMonth') {
               return <div className='day_target month-view'>{arg.date.getDate()}</div>;
             }
             return null;
           }}
-          // timeGridWeek ビューでのみカスタム曜日ヘッダーを適用
           dayHeaderContent={formatDayHeader}
         />
 

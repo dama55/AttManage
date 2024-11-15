@@ -153,13 +153,11 @@
 
 /* イベントデザイン */
 
-.reqShift {
-    background-color: #66CDAA;
-    /* ミントティール */
+/* 共通デザイン */
+.commonShift {
     color: #FFFFFF;
     border-radius: 5px !important;
     overflow-wrap: normal;
-    /* overflow: hidden; */
     padding: 2px;
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2) !important;
     transition: box-shadow 0.3s ease;
@@ -167,57 +165,75 @@
     position: relative;
 }
 
-.reqShift:hover {
-    background-color: #66CDAA;
-    /* ミントティール */
-    color: #FFFFFF;
+.commonShift:hover {
     box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
     opacity: 0.9;
     scale: 1.01;
+}
+
+.commonShift:focus,
+.commonShift:active {
+    box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
+    opacity: 0.8;
+    scale: 0.98;
+}
+
+/* 個別デザイン */
+.reqShift {
+    background-color: #66CDAA; /* ミントティール */
+}
+
+.reqShift:hover {
+    background-color: #66CDAA;
 }
 
 .reqShift:focus,
 .reqShift:active {
     background-color: #66CDAA;
-    /* ミントティール */
-    color: #FFFFFF;
-    box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
-    opacity: 0.8;
-    scale: 0.98;
 }
 
 .avaShift {
-    background-color: #6495ED;
-    /* スカイブルー */
-    color: #FFFFFF;
-    border-radius: 5px !important;
-    overflow-wrap: normal;
-    padding: 2px;
-    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2) !important;
-    transition: box-shadow 0.3s ease;
-    border: none;
-    position: relative;
+    background-color: #6495ED; /* スカイブルー */
 }
 
 .avaShift:hover {
     background-color: #6495ED;
-    /* スカイブルー */
-    color: #FFFFFF;
-    box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
-    opacity: 0.9;
-    scale: 1.01;
 }
 
 .avaShift:focus,
 .avaShift:active {
     background-color: #6495ED;
-    /* スカイブルー */
-    color: #FFFFFF;
-    box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
-    opacity: 0.8;
-    scale: 0.98;
 }
 
-.avaShift:hover .buttonContainer{
-    display: f
+/* ユーザーがいないシフト (トマトレッド) */
+.assiShiftNoUser {
+    background-color: #FF6347; /* トマトレッド */
+    color: #FFFFFF;
 }
+
+.assiShiftNoUser:hover {
+    background-color: #FF6347;
+}
+
+.assiShiftNoUser:focus,
+.assiShiftNoUser:active {
+    background-color: #FF6347;
+}
+
+/* ユーザーがいるシフト (ダークオレンジ) */
+.assiShiftWithUser {
+    background-color: #FF8C00; /* ダークオレンジ */
+    color: #FFFFFF;
+}
+
+.assiShiftWithUser:hover {
+    background-color: #FF8C00;
+}
+
+.assiShiftWithUser:focus,
+.assiShiftWithUser:active {
+    background-color: #FF8C00;
+}
+
+
+
