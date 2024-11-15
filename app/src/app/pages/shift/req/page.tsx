@@ -12,11 +12,13 @@ import { withAuth } from '@/hooks/auth/withAuth';
 import { GiFullMetalBucketHandle } from 'react-icons/gi';
 import { Session } from '@supabase/supabase-js';
 import { DateSelectArg } from '@fullcalendar/core';
+import { TypeEvent } from '@/types/shiftTypes';
+import { AddEditableToEvents, MakeEventfromReqShift, mergeContinuousEvents, SplitAndConvertEventsToShift } from '@/utils/client/eventUtils';
 
 function ReqShiftPage() {
     const { sidePeakContent, setSidePeakContent, setPopUpContent, setSidePeakFlag } = useRootLayout();
-    const [pre_events, setPreEvents] = useState<ShiftReqData[]>([]);
-    const [events, setEvents] = useState<ShiftReqData[]>([]);
+    const [pre_events, setPreEvents] = useState<TypeEvent[]>([]);
+    const [events, setEvents] = useState<TypeEvent[]>([]);
     const [isEditable, setIsEditable] = useState(false);
     const { result, error, loading, getShiftReq, editShiftReq } = useShiftReq();
     const [editableMonth, setEditableMonth] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
@@ -40,8 +42,28 @@ function ReqShiftPage() {
         const { month, year } = editableMonth;
         const deleteStart = new Date(year, month - 1, 1); // 月の初日
         const deleteEnd = new Date(year, month, 0); // 月の最終日
-        editShiftReq(deleteStart.toISOString(), deleteEnd.toISOString(), pre_events, events);
+        const { reqShifts: prev_reqShifts } = SplitAndConvertEventsToShift(pre_events);
+        const { reqShifts } = SplitAndConvertEventsToShift(events);
+
+        editShiftReq(deleteStart.toISOString(), deleteEnd.toISOString(), prev_reqShifts, reqShifts);
     };
+
+    const initShiftData = (info: DateSelectArg, session: Session) => {
+        return {
+            id: Math.floor(Math.random() * 9000000) + 1000000, //一時IDを付加する 
+            start: info.start,
+            end: info.end,
+            allDay: false,
+            color: '#66CDAA', // スカイブルー
+            className: 'reqShift commonShift',
+            extendedProps: {
+                event_type: '1', //シフト希望
+                req_num: 1, //ユーザーID
+                eventEditable: true, //編集可能
+            }
+        };
+    };
+
 
     const baseProps = {
         events: events,
@@ -49,22 +71,7 @@ function ReqShiftPage() {
         isEditable: isEditable,
         editableMonth: editableMonth,
         setEditableMonth: setEditableMonth,
-        initShiftData: (info: DateSelectArg, session: Session | null | undefined) => {
-            //シフトデータの初期値
-            return {
-                id: Math.floor(Math.random() * 9000000) + 1000000, //一時IDを付加する 
-                userId: "",
-                req_num: 1,
-                start: info.start,
-                end: info.end,
-                allDay: false,
-                color: '#66CDAA', // ミントティール
-                className: 'reqShift',
-                extendedProps: {
-                    req_num: 1  // カスタムデータを追加
-                }
-            }
-        },
+        initShiftData,
     }
 
     const sideProps = {
@@ -133,19 +140,15 @@ function ReqShiftPage() {
                 const response = await getShiftReq(getStart, getEnd);
                 console.log("response: ", response);
                 if (response !== null) {
-                    console.log("response.result: ", response.data);
 
+                    let updateEvents_req: TypeEvent[] = MakeEventfromReqShift(response.data);
                     //各シフトに色とクラス名を指定
-                    const updatedEvents = response.data.map(event => ({
-                        ...event,
-                        color: '#66CDAA', // ミントティール
-                        className: 'reqShift',
-                        extendedProps: {
-                            req_num: event.req_num  // カスタムデータを追加
-                        }
-                    }));
-                    setEvents(updatedEvents);
-                    setPreEvents(updatedEvents);
+                    updateEvents_req = AddEditableToEvents(updateEvents_req, true);
+
+                    const mergedEvents = mergeContinuousEvents(updateEvents_req);
+
+                    setEvents(mergedEvents);
+                    setPreEvents(updateEvents_req);
                 }
             }
         };

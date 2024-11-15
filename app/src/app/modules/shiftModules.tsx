@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import { getDefaultEventEnd } from '@fullcalendar/core/internal';
 import { withErrorHandling } from '@/utils/errorHandler';
+import { convertToISOFormat } from '@/utils/stringUtils';
 
 
 interface timeData {
@@ -115,7 +116,14 @@ export const getMultiShiftAve = withErrorHandling(async (
         throw new Error(error.message);
     }
 
-    return results;
+    // 日時データの変換
+    const convertedResults = results.map(item => ({
+        ...item,
+        start: convertToISOFormat(item.start),
+        end: convertToISOFormat(item.end)
+    }));
+
+    return convertedResults;
 });
 
 /* 店側の要求シフト */
@@ -138,6 +146,65 @@ export const getShiftReq = withErrorHandling(async (
     if (error) {
         throw new Error(error.message);
     }
+
+    if(results.length < 1){
+        return []; //要素数が0ならからの配列を返す．
+    }
+
+    // 日時データの変換
+    const convertedResults = results.map(item => ({
+        ...item,
+        start: convertToISOFormat(item.start),
+        end: convertToISOFormat(item.end)
+    }));
+
     
+    return convertedResults;
+});
+
+/* 確定したシフト情報を返す */
+export const getShiftAssi = withErrorHandling(async (
+    getStart: string, //開始区間
+    getEnd: string //終わり区間
+) => {
+    console.log("function getShiftAssi");
+    console.log("getStart:", getStart);
+    console.log("getEnd:", getEnd);
+    
+    // stringに変換してデータベースに渡す
+    const str_getStart = getStart;
+    const str_getEnd = getEnd;
+
+    const { data: results, error } = await supabase
+        .from('Shift_Assi')
+        .select('*')
+        .gte('start', str_getStart)
+        .lte('end', str_getEnd);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
     return results;
 });
+
+export async function deleteAndInsertAssishift(
+    deleteStart: string,    // 開始日時（ISOフォーマットの文字列）
+    deleteEnd: string,      // 終了日時（ISOフォーマットの文字列）
+    delData: timeData[], // 削除するデータの配列（IDを含むオブジェクト）
+    addData: timeData[] // 追加するデータの配列
+) {
+
+    const { data, error } = await supabase
+        .rpc('delete_and_insert_assi_shifts', {
+            delete_data: delData, 
+            insert_data: addData,   
+        });
+
+    if (error) {
+        console.error("Error in delete_and_insert_shifts:", error);
+        throw new Error(error.message);
+    }
+
+    return data;
+}

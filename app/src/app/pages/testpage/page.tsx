@@ -26,7 +26,7 @@ export default function ExamplePage() {
 function SideContentComponent() {
   const [events, setEvents] = useState([]);
   return <div>
-    <CalendarComponent events={events} setEvents={setEvents} isEditable={true}/>
+    {/* <CalendarComponent events={events} setEvents={setEvents} isEditable={true}/> */}
     <div>
       <h2>サイドピークのテーブル</h2>
       <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid black' }}>

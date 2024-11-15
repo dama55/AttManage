@@ -17,16 +17,11 @@ import { withErrorHandling } from '@/utils/errorHandler';
  */
 export const POST = withErrorHandling(async (req: Request) => {
 
-    console.log("I'm here and result is as follows");
-
     // リクエストボディからデータを取得
     const { getStart, getEnd } = await req.json();
 
     // deleteAndInsertshift関数を呼び出し
     const result = await getShiftReq(getStart, getEnd);
-
-    
-    
 
     // 成功レスポンスを返す
     return NextResponse.json({ message: '操作が成功しました', data: result });
