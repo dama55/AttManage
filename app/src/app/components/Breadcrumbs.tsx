@@ -11,7 +11,12 @@ const breadcrumbLabels: { [key: string]: string } = {
     '/pages': 'ホーム',
     '/pages/shift/req': 'シフト要求',
     '/pages/shift/plan': 'シフト決定',
+    '/pages/shift/ava': 'シフト設定',
     '/pages/shift': 'シフト管理',
+    '/pages/att': '打刻管理',
+    '/pages/att/time_stamp': '打刻ページ',
+    '/pages/signin': 'サインイン',
+    '/pages/signup': 'サインアップ',
 
 
     // 必要に応じて追加
@@ -25,8 +30,6 @@ const getLabel = (href: string) => {
 const Breadcrumbs = () => {
     const pathname = usePathname();  // `usePathname` を使用して現在のパスを取得
     const pathSegments = pathname.split('/').filter(seg => seg);
-
-    console.log("pathSeg: ", pathSegments);
 
     const breadcrumbs = pathSegments.map((segment, index) => {
         const href = '/' + pathSegments.slice(0, index + 1).join('/');
