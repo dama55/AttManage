@@ -1,0 +1,240 @@
+/* タイトルのスタイル */
+.fc-toolbar-title {
+    font-weight: normal;
+    font-size: var(--font-size-xxlarge);
+}
+
+/* 日付グリッドの文字表示を変える */
+.fc-daygrid-day-top {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    margin-top: 5px;
+}
+
+/* 曜日セルのスタイル */
+.fc-col-header-cell {
+    border-left: none !important;
+    /* 左の枠線を消す */
+    border-right: none !important;
+    /* 右の枠線を消す */
+}
+
+/* 土日セルのスタイル */
+.fc-day-sat.fc-daygrid-day,
+.fc-day-sun.fc-daygrid-day {
+    background-color: rgb(247, 247, 245);
+    /* 土日の色 */
+}
+
+/* 編集状態で無効化されたセルのデザイン */
+.fc-day-disabled {
+    background-color: rgb(241, 241, 239) !important;
+    position: relative;
+}
+
+/* 編集状態で無効化されたセルを暗くするデザイン */
+.fc-day-disabled::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.1);
+    /* 半透明の黒 */
+    z-index: 3;
+    /* ダイアログの後ろに配置 */
+}
+
+/* カレンダー上部のスタイル */
+.fc-scrollgrid {
+    /* カレンダーの上のボーダーをなくす */
+    border-top: none !important;
+    box-shadow: none !important;
+}
+
+
+/* 今日の日付のデフォルトスタイルをリセット */
+.fc-day-today {
+    background: none !important;
+    /* デフォルトの黄色背景を削除 */
+}
+
+/* 今日の日付の数値を赤い丸で囲む */
+.fc-day-today .fc-daygrid-day-number .day_target {
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    /* 丸くする */
+    padding: 4px 8px;
+    /* サイズ調整 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-weight: bold;
+    /* フォントを強調 */
+}
+
+.day-header-today {
+    background-color: red;
+    width: var(--font-size-xxlarge);
+    height: var(--font-size-xxlarge);
+    color: white;
+    border-radius: 50%;
+    /* 丸くする */
+    font-weight: bold;
+    /* フォントを強調 */
+}
+
+/* 日付番号のホバー時の背景色と文字色変更 */
+.fc-daygrid-day-number .month-view {
+    border-radius: 50%;
+    /* 丸くする */
+    width: var(--font-size-xlarge);
+    height: var(--font-size-xlarge);
+    display: flex;
+    align-items: center;
+    /* 垂直方向の中央揃え */
+    justify-content: center;
+    /* 水平方向の中央揃え */
+}
+
+/* 日付番号のホバー時の背景色と文字色変更 */
+.fc-daygrid-day:hover .fc-daygrid-day-number .month-view {
+    background-color: rgba(17, 44, 51, 0.4);
+    /* ホバー時の灰色背景 */
+    color: white;
+}
+
+
+
+
+/* ヘッダー全体の背景色 */
+.fc-toolbar {
+    padding: 0 10px;
+}
+
+/* カレンダーヘッダーのボタンスタイル */
+.fc-button {
+    color: black !important;
+    /* 文字色 */
+    background: none !important;
+    /* 背景色を透明に */
+    border: none !important;
+    /* ボーダーを最初はなし */
+    padding: 8px 12px !important;
+    margin: 0 2px !important;
+    transition: border-color 0.2s ease, color 0.2s ease;
+    border-radius: 4px !important;
+    /* 角を丸く */
+}
+
+/* ボタンホバー時の背景色 */
+.fc-button:hover {
+    background-color: rgba(200, 200, 200, 0.5) !important;
+    /* ホバー時の背景色 */
+}
+
+/* ボタンクリック時の背景色 */
+.fc-button:active {
+    background-color: rgba(150, 150, 150, 0.8) !important;
+    /* クリック時の背景色 */
+}
+
+/* 矢印アイコンの色設定 */
+.fc-prev-button,
+.fc-next-button {
+    color: rgba(55, 53, 47, 0.5) !important;
+    /* 矢印色 */
+}
+
+/* イベントデザイン */
+
+/* 共通デザイン */
+.commonShift {
+    color: #FFFFFF;
+    border-radius: 5px !important;
+    overflow-wrap: normal;
+    padding: 2px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2) !important;
+    transition: box-shadow 0.3s ease;
+    border: none;
+    position: relative;
+}
+
+.commonShift:hover {
+    box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
+    opacity: 0.9;
+    scale: 1.01;
+}
+
+.commonShift:focus,
+.commonShift:active {
+    box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3) !important;
+    opacity: 0.8;
+    scale: 0.98;
+}
+
+/* 個別デザイン */
+.reqShift {
+    background-color: #66CDAA; /* ミントティール */
+}
+
+.reqShift:hover {
+    background-color: #66CDAA;
+}
+
+.reqShift:focus,
+.reqShift:active {
+    background-color: #66CDAA;
+}
+
+.avaShift {
+    background-color: #6495ED; /* スカイブルー */
+}
+
+.avaShift:hover {
+    background-color: #6495ED;
+}
+
+.avaShift:focus,
+.avaShift:active {
+    background-color: #6495ED;
+}
+
+/* ユーザーがいないシフト (トマトレッド) */
+.assiShiftNoUser {
+    background-color: #FF6347; /* トマトレッド */
+    color: #FFFFFF;
+}
+
+.assiShiftNoUser:hover {
+    background-color: #FF6347;
+}
+
+.assiShiftNoUser:focus,
+.assiShiftNoUser:active {
+    background-color: #FF6347;
+}
+
+/* ユーザーがいるシフト (ダークオレンジ) */
+.assiShiftWithUser {
+    background-color: #FF8C00; /* ダークオレンジ */
+    color: #FFFFFF;
+}
+
+.assiShiftWithUser:hover {
+    background-color: #FF8C00;
+}
+
+.assiShiftWithUser:focus,
+.assiShiftWithUser:active {
+    background-color: #FF8C00;
+}
+
+
+
+

@@ -1,0 +1,13 @@
+.button_text{
+    font-size: var(--font-size-large);
+    padding: 5px;
+}
+
+.edit_title h1{
+    display: flex;
+    align-items: center;
+}
+
+.title_icon{
+    padding-left: 10px;
+}

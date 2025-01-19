@@ -1,15 +1,28 @@
 // src/app/layout.tsx
-'use client'; // クライアントコンポーネントとして設定
+import React from 'react';
+import HeaderWrapper from "@/components/Header"; // Headerをインポート
+import EmployeeListServ from "@/components/server/EmployeeListServ";
+import { layoutConfig } from "@/pages/layoutConfig";
+import { RootLayoutProvider } from '@/contexts/RootLayoutContext';
+import { SessionContextProvider } from '@/contexts/SessionContext';
+import styles from '@/pages/styles.module.css';
 
-import { SessionProvider } from "next-auth/react";
-import Header from "@/components/Header"; // Headerをインポート
+export default function RootLayout({ 
+    children,
+    }: { 
+        children: React.ReactNode;
+    }) {
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-                <SessionProvider>
-                    {/* HeaderをSessionProvider内に配置 */}
-                    <Header />
-                    {children}
-                </SessionProvider>
+        <>
+            <SessionContextProvider>
+                <HeaderWrapper />
+                <RootLayoutProvider>
+                    <main className={styles.main}>
+                        {children}
+                    </main>
+                </RootLayoutProvider>
+            </SessionContextProvider>
+        </>
     );
 }

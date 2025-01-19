@@ -1,45 +1,35 @@
 'use client';
 import { useState } from 'react';
+import { useAuth } from '@/hooks/auth/useAuth';
+import { emitKeypressEvents } from 'readline';
+import styles from '@/components/auth/SignInForm.module.css';
+import Link from 'next/link';
 
 function SignUpForm() {
-  const [error, setError] = useState<string | null>(null);
+  const {message, signUp} = useAuth();
+  // const [message, setMessage] = useState<string | null>(null);
 
   const handleSignUp = async (event: any) => {
     event.preventDefault();
-    const name = event.target.name.value;
+    const displayName = event.target.displayName.value; // 表示名を取得
+    const email = event.target.email.value; // メールアドレスを取得
     const password = event.target.password.value;
 
-    try {
-      // サインアップ処理（APIリクエストを送信するなど）
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Sign-up failed');
-      }
-
-      // サインアップ成功後の処理（例えば、サインインページへのリダイレクトなど）
-      console.log('Sign-up successful');
-    } catch (err: unknown) {
-
-        if (err instanceof Error){
-            // エラーハンドリング
-            setError(err.message);
-            console.error('Sign-up failed:', err);
-        }
-    }
+    signUp(displayName, email, password);//カスタムフックを呼び出し
+  
   };
 
   return (
-    <form onSubmit={handleSignUp}>
-      <input type="text" name="name" placeholder="Name" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Sign Up</button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <>
+    <form className={styles.container} onSubmit={handleSignUp}>
+      <input className={styles.Signinput} type="text" name="displayName" placeholder="Display Name" required /> {/* 表示名の入力フィールド */}
+      <input className={styles.Signinput} type="email" name="email" placeholder="Email" required />
+      <input className={styles.Signinput} type="password" name="password" placeholder="Password" required />
+      <button className={styles.custom_button} type="submit">Sign Up</button>
+      {message && <p style={{ color: 'red' }}>{message}</p>}
+      <Link href='/pages/signin'>サインインページ</Link>
     </form>
+    </>
   );
 }
 

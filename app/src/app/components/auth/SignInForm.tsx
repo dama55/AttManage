@@ -1,42 +1,34 @@
 'use client';
-import { signIn } from "next-auth/react";
 import { useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/hooks/auth/useAuth';
+import styles from '@/components/auth/SignInForm.module.css';
+import ControlButton from '@/components/ControlButton';
+import Link from 'next/link';
 
 function SignInForm() {
-
-  const [error, setError] = useState<string | null>(null);
+  const { message, signIn } = useAuth();
 
   const handleSignIn = async (event: any) => {
     event.preventDefault();
-    const name = event.target.name.value;
-    const password = event.target.password.value;
+    const email = event.target.email.value; // メールアドレスを取得
+    const password = event.target.password.value;//パスワードを取得
 
-    console.log("name: ", name);
-    console.log("password: ", password);
-    
-    // NextAuth.jsを使ってサインイン
-    const result = await signIn("credentials", {
-      redirect: false,
-      name,
-      password,
-    });
-
-    if (result?.error) {
-      // 認証エラーの処理
-      setError(error);
-      console.error("Sign-in failed:", result.error);
-    }
-  };
+    signIn(email, password);
+  }
 
   return (
-    <form onSubmit={handleSignIn}>
-      <input type="text" name="name" placeholder="Name" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Sign In</button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-    </form>
+    <>
+      <form className={styles.container} onSubmit={handleSignIn}>
+        <input className={styles.Signinput} type="email" name="email" placeholder="Email" required />
+        <input className={styles.Signinput} type="password" name="password" placeholder="Password" required />
+        <button className={styles.custom_button} type="submit">Sign In</button>
+        {message && <p style={{ color: 'red' }}>{message}</p>}
+        <Link href='/pages/signup'>サインアップページ</Link>
+      </form>
+
+    </>
   );
 }
-
 
 export default SignInForm;

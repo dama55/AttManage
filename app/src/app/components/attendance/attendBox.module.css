@@ -1,0 +1,49 @@
+/* styles/ClockPage.module.css */
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 40px;
+    /* height: 600px; */
+    /* width: 500px; */
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    padding-bottom: 20px;
+    border: 3px solid black;
+    border-color: black; 
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.title{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #232f3e;
+    color: white;
+}
+
+.clockInfo {
+    text-align: center;
+    margin-top: 20px;
+    width: 80%;
+    max-width: 500px;
+}
+
+
+.clockButton:hover {
+    background-color: #45a049;
+}
+
+.remarks {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: none;
+}
